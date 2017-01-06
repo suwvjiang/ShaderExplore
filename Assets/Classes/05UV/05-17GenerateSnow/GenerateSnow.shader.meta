@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: d440c52de2fd96b46ac0dc4f60a1488f
+timeCreated: 1460721106
+licenseType: Pro
+ShaderImporter:
+  defaultTextures:
+  - _SnowAlphaTex: {fileID: 2800000, guid: 28c7aad1372ff114b90d330f8a2dd938, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
