@@ -27,8 +27,8 @@ Shader "Hidden/Shader Forge/SFN_Depth" {
             };
             VertexOutput vert (VertexInput v) {
                 VertexOutput o = (VertexOutput)0;
-                o.posWorld = mul(_Object2World, v.vertex);
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex );
+                o.posWorld = mul(unity_ObjectToWorld, v.vertex);
+                o.pos = UnityObjectToClipPos(v.vertex );
                 o.projPos = ComputeScreenPos (o.pos);
                 COMPUTE_EYEDEPTH(o.projPos.z);
                 return o;

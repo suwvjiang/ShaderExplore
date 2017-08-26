@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Shader created with Shader Forge v1.26 
 // Shader Forge (c) Neat Corporation / Joachim Holmer - http://www.acegikmo.com/shaderforge/
 // Note: Manually altering this data may prevent you from opening it in Shader Forge
@@ -42,7 +44,7 @@ Shader "Oboro/Sin" {
                 float4 node_2144 = _Time + _TimeEditor;
                 float node_6755 = sin((node_2144.g*_Frequency));
                 v.vertex.xyz += float3(node_6755,node_6755,node_6755);
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex );
+                o.pos = UnityObjectToClipPos(v.vertex );
                 UNITY_TRANSFER_FOG(o,o.pos);
                 return o;
             }
@@ -86,7 +88,7 @@ Shader "Oboro/Sin" {
                 float4 node_2144 = _Time + _TimeEditor;
                 float node_6755 = sin((node_2144.g*_Frequency));
                 v.vertex.xyz += float3(node_6755,node_6755,node_6755);
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex );
+                o.pos = UnityObjectToClipPos(v.vertex );
                 TRANSFER_SHADOW_CASTER(o)
                 return o;
             }

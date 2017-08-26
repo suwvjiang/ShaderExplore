@@ -1,4 +1,8 @@
-﻿Shader "Custom/AlphaTestWithShadow" 
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/AlphaTestWithShadow" 
 {
 	Properties 
 	{
@@ -43,9 +47,9 @@
 			v2f vert(a2v v)
 			{
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.worldNormal = mul(v.normal, (float3x3)_World2Object);
-				o.worldPos = mul(_Object2World, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 				TRANSFER_SHADOW(o);
 				return o;

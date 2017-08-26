@@ -1,11 +1,11 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{A958FA1F-1C9A-DFC7-B650-29AD13A3FF40}") = "ShaderExplore", "Assembly-CSharp-firstpass.csproj", "{03274465-915D-4780-819F-8B282FDAE3DC}"
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderExplore", "Assembly-CSharp-firstpass.csproj", "{03274465-915D-4780-819F-8B282FDAE3DC}"
 EndProject
-Project("{A958FA1F-1C9A-DFC7-B650-29AD13A3FF40}") = "ShaderExplore", "Assembly-CSharp.csproj", "{9515731C-D721-E937-1508-A983E66C9612}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderExplore", "Assembly-CSharp.csproj", "{9515731C-D721-E937-1508-A983E66C9612}"
 EndProject
-Project("{A958FA1F-1C9A-DFC7-B650-29AD13A3FF40}") = "ShaderExplore", "Assembly-CSharp-Editor.csproj", "{195D2695-2382-EADF-DE51-6C5F14EFA2E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderExplore", "Assembly-CSharp-Editor.csproj", "{195D2695-2382-EADF-DE51-6C5F14EFA2E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

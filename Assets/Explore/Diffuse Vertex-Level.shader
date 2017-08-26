@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "UnityExplore/Diffuse Vertex-Level"
 {
 	Properties
@@ -38,7 +40,7 @@ Shader "UnityExplore/Diffuse Vertex-Level"
 			v2f vert(a2v i)
 			{
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, i.vertex);
+				o.pos = UnityObjectToClipPos(i.vertex);
 				o.uv = TRANSFORM_TEX(i.texcoord0, _MainTex);
 				
 				return o;

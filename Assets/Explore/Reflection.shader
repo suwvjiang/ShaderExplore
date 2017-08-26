@@ -1,3 +1,6 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "UnityExplore/Reflection"
 {
 	Properties
@@ -34,8 +37,8 @@ Shader "UnityExplore/Reflection"
 			v2f vert(a2v i)
 			{
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, i.vertex);
-				o.worldPos = mul(_Object2World, i.vertex).xyz;
+				o.pos = UnityObjectToClipPos(i.vertex);
+				o.worldPos = mul(unity_ObjectToWorld, i.vertex).xyz;
 				o.worldNormal = UnityObjectToWorldNormal(i.normal);
 				fixed3 worldView = UnityWorldSpaceViewDir(o.worldPos);
 				o.worldReflect = reflect(-worldView, o.worldNormal);

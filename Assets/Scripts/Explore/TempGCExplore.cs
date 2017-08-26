@@ -17,7 +17,7 @@ public class TempGCExplore:MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W))
         {
             int i = cnt;
-            Profiler.BeginSample("GCTest stringbuilder append");
+            UnityEngine.Profiling.Profiler.BeginSample("GCTest stringbuilder append");
 
             while (--i >= 0)
             {
@@ -28,12 +28,12 @@ public class TempGCExplore:MonoBehaviour
                 a.Append("C");
                 a.Append("D");
             }
-            Profiler.EndSample();
+            UnityEngine.Profiling.Profiler.EndSample();
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
             int i = cnt;
-            Profiler.BeginSample("GCTest string plus");
+            UnityEngine.Profiling.Profiler.BeginSample("GCTest string plus");
 
             while (--i >= 0)
             {
@@ -44,35 +44,35 @@ public class TempGCExplore:MonoBehaviour
                 a += ("C");
                 a += ("D");
             }
-            Profiler.EndSample();
+            UnityEngine.Profiling.Profiler.EndSample();
         } 
         else if (Input.GetKeyDown(KeyCode.A))
         {
             int i = cnt;
-            Profiler.BeginSample("GCTest string format");
+            UnityEngine.Profiling.Profiler.BeginSample("GCTest string format");
 
             while (--i >= 0)
             {
                 string a = string.Format("{0}{1}{2}{3}{4}", ("jiangchufei"), ("A"), ("B"), ("C"), ("D"));
             }
-            Profiler.EndSample();
+            UnityEngine.Profiling.Profiler.EndSample();
         } 
         else if (Input.GetKeyDown(KeyCode.D))
         {
             int i = cnt;
-            Profiler.BeginSample("GCTest stringbuilder format");
+            UnityEngine.Profiling.Profiler.BeginSample("GCTest stringbuilder format");
 
             while (--i >= 0)
             {
                 StringBuilder a = new StringBuilder();
                 a.AppendFormat("{0}{1}{2}{3}{4}", ("jiangchufei"), ("A"), ("B"), ("C"), ("D"));
             }
-            Profiler.EndSample();
+            UnityEngine.Profiling.Profiler.EndSample();
         } 
         else if (Input.GetKeyDown(KeyCode.Q))
         {
             int i = cnt;
-            Profiler.BeginSample("GCTest one stringbuilder append");
+            UnityEngine.Profiling.Profiler.BeginSample("GCTest one stringbuilder append");
 
             StringBuilder a = new StringBuilder();
             while (--i >= 0)
@@ -84,12 +84,12 @@ public class TempGCExplore:MonoBehaviour
                 a.Append("C");
                 a.Append("D");
             }
-            Profiler.EndSample();
+            UnityEngine.Profiling.Profiler.EndSample();
         } 
         else if (Input.GetKeyDown(KeyCode.E))
         {
             int i = cnt;
-            Profiler.BeginSample("GCTest one stringbuilder format");
+            UnityEngine.Profiling.Profiler.BeginSample("GCTest one stringbuilder format");
 
             StringBuilder a = new StringBuilder();
             while (--i >= 0)
@@ -97,7 +97,7 @@ public class TempGCExplore:MonoBehaviour
                 a.Remove(0, a.Length);
                 a.AppendFormat("{0}{1}{2}{3}{4}", ("jiangchufei"), ("A"), ("B"), ("C"), ("D"));
             }
-            Profiler.EndSample();
+            UnityEngine.Profiling.Profiler.EndSample();
         } 
     }
 }

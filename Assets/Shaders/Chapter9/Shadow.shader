@@ -1,4 +1,9 @@
-﻿Shader "Custom/Shadow" 
+﻿// Upgrade NOTE: replaced '_LightMatrix0' with 'unity_WorldToLight'
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/Shadow" 
 {
 	Properties 
 	{
@@ -44,9 +49,9 @@
 			v2f vert(a2v v)
 			{
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.worldNormal = mul(v.normal, (float3x3)_World2Object);
-				o.worldPos = mul(_Object2World, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				TRANSFER_SHADOW(o);//计算阴影纹理坐标
 				return o;
 			}
@@ -109,9 +114,9 @@
 			v2f vert(a2v v)
 			{
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.worldNormal = mul(v.normal, (float3x3)_World2Object);
-				o.worldPos = mul(_Object2World, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				return o;
 			}
 
@@ -134,7 +139,7 @@
 				#ifdef USING_DIRECTIONAL_LIGHT
 					fixed atten = 1.0;
 				#else
-					float3 lightCoord = mul(_LightMatrix0, v.worldPos).xyz;
+					float3 lightCoord = mul(unity_WorldToLight, v.worldPos).xyz;
 					fixed atten = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
 				#endif
 

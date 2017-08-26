@@ -28,12 +28,12 @@ Shader "Hidden/Shader Forge/SFN_ObjectPosition" {
             VertexOutput vert (VertexInput v) {
                 VertexOutput o = (VertexOutput)0;
                 o.uv = v.texcoord0;
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex );
+                o.pos = UnityObjectToClipPos(v.vertex );
                 return o;
             }
             float4 frag(VertexOutput i) : COLOR {
                 // Operator
-                float4 outputColor = mul ( _Object2World, float4(0,0,0,1) );
+                float4 outputColor = mul ( unity_ObjectToWorld, float4(0,0,0,1) );
                 return outputColor * _OutputMask;
             }
             ENDCG

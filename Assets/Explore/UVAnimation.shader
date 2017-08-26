@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 shader "Explore/UV Animation"
 {
 	Properties
@@ -30,7 +32,7 @@ shader "Explore/UV Animation"
 			v2f vert(a2v i)
 			{
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, i.vertex);
+				o.pos = UnityObjectToClipPos(i.vertex);
 				o.uv = i.texcoord;
 				return o;
 			}

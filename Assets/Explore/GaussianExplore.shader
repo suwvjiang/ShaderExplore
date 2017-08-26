@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Explore/Gaussian Blur"
 {
 	Properties
@@ -20,7 +22,7 @@ Shader "Explore/Gaussian Blur"
 		v2f vertBlurVertical(appdata_img v)
 		{
 			v2f o;
-			o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+			o.pos = UnityObjectToClipPos(v.vertex);
 			half2 uv = v.texcoord;
 			o.uv[0] = uv;
 			o.uv[1] = uv + float2(0.0, _MainTex_TexelSize.y * 1.0) * _BlurSize;
@@ -34,7 +36,7 @@ Shader "Explore/Gaussian Blur"
 		v2f vertBlurHorizontal(appdata_img v)
 		{
 			v2f o;
-			o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+			o.pos = UnityObjectToClipPos(v.vertex);
 			half2 uv = v.texcoord;
 			o.uv[0] = uv;
 			o.uv[1] = uv + float2(_MainTex_TexelSize.x * 1.0, 0.0) * _BlurSize;

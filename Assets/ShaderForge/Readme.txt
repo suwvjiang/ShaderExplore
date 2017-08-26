@@ -1,9 +1,17 @@
-﻿
+﻿http://www.cgsoso.com/forum-211-1.html
 
-README - SHADER FORGE:
-----------------------
-First off - Massive thanks for purchasing Shader Forge!
-You hopefully can't wait to get started, but you should give this document a read, it's not that long :)
+CG搜搜 Unity3d 每日Unity3d插件免费更新 更有VIP资源！
+
+CGSOSO 主打游戏开发，影视设计等CG资源素材。
+
+插件如若商用，请务必官网购买！
+
+daily assets update for try.
+
+U should buy the asset from home store if u use it in your project!
+
+
+README - SHADER FORGE
 
 
 Contact / Support:
@@ -12,8 +20,9 @@ Mail - joachim@neatcorporation.com
 Bugs & feature requests - http://shaderforge.userecho.com/
 Twitter - @JoachimHolmer / #ShaderForge
 
-Please avoid sending me mails along the lines of "How do I make a shader that ________ ? " - I'm not everyone's personal technical artist!
-Keep that to the forum threads so others can see and potentially help you too. (Though I will respond there as well)
+Please avoid sending me questions like "How do I make a shader that ________ ? ".
+I'm unfortunately unable to respond to all shader inquiries, given the volume of users and the limited time I have.
+Try to keep that to the forum threads so that others can see and potentially help you too. (Though I will occasionally respond there as well)
 
 Website:
 --------
@@ -30,7 +39,7 @@ Legal Stuff / Licensing:
 ------------------------
 Shader Forge is licensed per-seat, as with all other editor extensions, according to Unity's EULA.
 This means that in order for a team to use Shader Forge, everyone who want to be able to use it, needs their own license.
-If you finish and release a product in Unity, using Shader Forge, I would appreciate a mention of Shader Forge in the credits :)
+If you finish and release a product using Shader Forge, I would appreciate a mention of Shader Forge in the credits :)
 
 
 Selling shaders created in Shader Forge:

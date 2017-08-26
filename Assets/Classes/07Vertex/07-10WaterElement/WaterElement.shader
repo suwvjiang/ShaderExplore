@@ -1,3 +1,6 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Shader created with Shader Forge v1.26 
 // Shader Forge (c) Neat Corporation / Joachim Holmer - http://www.acegikmo.com/shaderforge/
 // Note: Manually altering this data may prevent you from opening it in Shader Forge
@@ -73,17 +76,17 @@ Shader "Oboro/WaterElement" {
                 VertexOutput o = (VertexOutput)0;
                 o.uv0 = v.texcoord0;
                 o.normalDir = UnityObjectToWorldNormal(v.normal);
-                float4 objPos = mul ( _Object2World, float4(0,0,0,1) );
+                float4 objPos = mul ( unity_ObjectToWorld, float4(0,0,0,1) );
                 float4 _MaskTex_var = tex2Dlod(_MaskTex,float4(TRANSFORM_TEX(o.uv0, _MaskTex),0.0,0));
                 fixed4 node_4184 = _Time + _TimeEditor;
                 v.vertex.xyz += (_MaskTex_var.r*(sin(((o.uv0.g*_WaveLength)+(node_4184.g*_Frequency)))+0.9)*_Amplitude*v.normal);
-                o.posWorld = mul(_Object2World, v.vertex);
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex );
+                o.posWorld = mul(unity_ObjectToWorld, v.vertex);
+                o.pos = UnityObjectToClipPos(v.vertex );
                 UNITY_TRANSFER_FOG(o,o.pos);
                 return o;
             }
             float4 frag(VertexOutput i) : COLOR {
-                float4 objPos = mul ( _Object2World, float4(0,0,0,1) );
+                float4 objPos = mul ( unity_ObjectToWorld, float4(0,0,0,1) );
                 i.normalDir = normalize(i.normalDir);
                 float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWorld.xyz);
                 float3 normalDirection = i.normalDir;
@@ -146,7 +149,7 @@ Shader "Oboro/WaterElement" {
                 float4 _MaskTex_var = tex2Dlod(_MaskTex,float4(TRANSFORM_TEX(o.uv0, _MaskTex),0.0,0));
                 fixed4 node_4184 = _Time + _TimeEditor;
                 v.vertex.xyz += (_MaskTex_var.r*(sin(((o.uv0.g*_WaveLength)+(node_4184.g*_Frequency)))+0.9)*_Amplitude*v.normal);
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex );
+                o.pos = UnityObjectToClipPos(v.vertex );
                 TRANSFER_SHADOW_CASTER(o)
                 return o;
             }

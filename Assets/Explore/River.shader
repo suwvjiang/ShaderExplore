@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Explore/River"
 {
 	Properties
@@ -49,7 +51,7 @@ Shader "Explore/River"
 			v2f vert(a2v i)
 			{
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, i.vertex);
+				o.pos = UnityObjectToClipPos(i.vertex);
 				o.uv = i.texcoord0;
 				o.uv1 = i.texcoord1;
 				return o;
