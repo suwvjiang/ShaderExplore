@@ -80,8 +80,8 @@
 			fixed4 frag (v2f i) : SV_Target
 			{
 				float3 worldPos = float3(i.t2wx.w, i.t2wy.w, i.t2wz.w);
-				float3 light = UnityWorldSpaceLightDir(worldPos);
-				float3 view = UnityWorldSpaceViewDir(worldPos);
+				float3 light = normalize(UnityWorldSpaceLightDir(worldPos));
+				float3 view = normalize(UnityWorldSpaceViewDir(worldPos));
 
 				float3 bump = UnpackNormal(tex2D(_BumpMap, i.uv.zw));
 				bump.xy *= _BumpScale;
