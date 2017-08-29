@@ -19,6 +19,7 @@
 			#pragma fragment frag
 			// make fog work
 			#pragma multi_compile_fog
+			#pragma multi_compile_fwdbase
 			
 			#include "UnityCG.cginc"
 			#include "Lighting.cginc"
@@ -51,7 +52,7 @@
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				UNITY_TRANSFER_FOG(o,o.vertex);
-				o.normal = normalize(UnityObjectToWorldNormal(v.normal));
+				o.normal = UnityObjectToWorldNormal(v.normal);
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				return o;
 			}
@@ -71,7 +72,7 @@
 
 				float3 viewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
 				float3 h = normalize(viewDir + light);
-				float temp = dot(h, normal) * 0.5 + 0.5;
+				float temp = saturate(dot(h, normal));
 				float3 specular = _Specular.rgb * _LightColor0.rgb * pow(temp, _Gloss);
 				
 				float3 color = ambient + diff + specular;
