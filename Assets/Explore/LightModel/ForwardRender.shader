@@ -156,11 +156,10 @@
 				#endif
 
 				return fixed4((diffuse + specular)*atten, 1);
-
-
 			}
 
 			ENDCG
 		}
 	}
+	Fallback "Specular"
 }

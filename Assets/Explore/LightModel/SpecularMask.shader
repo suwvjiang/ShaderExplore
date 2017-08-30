@@ -66,7 +66,6 @@
 				o.uv.zw = v.uv * _BumpMap_ST.xy + _BumpMap_ST.zw;
 				o.uv1 = v.uv * _SpecularMask_ST.xy + _SpecularMask_ST.zw;
 
-				UNITY_TRANSFER_FOG(o,o.vertex);
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				float3 worldTangent = UnityObjectToWorldDir(v.tangent);
 				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
