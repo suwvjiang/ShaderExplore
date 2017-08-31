@@ -4,7 +4,7 @@
 	{
 		_Color("Color", Color) = (1,1,1,1)
 		_MainTex ("Texture", 2D) = "white" {}
-		_Clip("Clip", Range(0,1)) = 0.5
+		_Cutoff("Clip", Range(0,1)) = 0.5
 	}
 	SubShader
 	{
@@ -23,6 +23,7 @@
 			
 			#include "UnityCG.cginc"
 			#include "Lighting.cginc"
+			#include "AutoLight.cginc"
 
 			struct appdata
 			{
@@ -34,8 +35,8 @@
 			struct v2f
 			{
 				float2 uv : TEXCOORD0;
-				UNITY_FOG_COORDS(1)
-				float4 vertex : SV_POSITION;
+				SHADOW_COORDS(1)
+				float4 pos : SV_POSITION;
 				float3 worldPos:TEXCOORD2;
 				float3 worldNormal:TEXCOORD3;
 			};
@@ -43,16 +44,16 @@
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 			float4 _Color;
-			float _Clip;
+			float _Cutoff;
 			
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-				UNITY_TRANSFER_FOG(o,o.vertex);
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				o.worldNormal = UnityObjectToWorldNormal(v.normal);
+				TRANSFER_SHADOW(o);
 				return o;
 			}
 			
@@ -60,9 +61,8 @@
 			{
 				// sample the texture
 				fixed4 albedo = tex2D(_MainTex, i.uv);
-				clip(albedo.a - _Clip);
-				// apply fog
-				UNITY_APPLY_FOG(i.fogCoord, albedo);
+				clip(albedo.a - _Cutoff);
+
 				float3 normal = normalize(i.worldNormal);
 				float3 light = normalize(UnityWorldSpaceLightDir(i.worldPos));
 				float halflambert = dot(light, normal) * 0.5 + 0.5;
@@ -70,7 +70,9 @@
 
 				float3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
 
-				return fixed4(diffuse + ambient, 1);
+				UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);
+
+				return fixed4(diffuse*atten + ambient, 1);
 			}
 			ENDCG
 		}

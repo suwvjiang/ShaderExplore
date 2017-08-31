@@ -107,10 +107,9 @@
 				fixed4 mask = tex2D(_Specular, i.uv1);
 				fixed3 specular = _SpecularColor.rgb * _LightColor0.rgb * pow(temp, _Gloss) * _SpecScale * mask.r ;
 
-				fixed shadow = SHADOW_ATTENUATION(i);
-				fixed atten = 1.0;
+				UNITY_LIGHT_ATTENUATION(atten, i, worldPos);
 
-				return fixed4(ambient + (diffuse + specular) * atten * shadow, 1);
+				return fixed4(ambient + (diffuse + specular) * atten, 1);
 			}
 			ENDCG
 		}
