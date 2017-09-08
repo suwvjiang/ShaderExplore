@@ -19,7 +19,7 @@
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma mutli_compile_fwdbase
+			#pragma multi_compile_fwdbase
 			
 			#include "UnityCG.cginc"
 			#include "Lighting.cginc"
