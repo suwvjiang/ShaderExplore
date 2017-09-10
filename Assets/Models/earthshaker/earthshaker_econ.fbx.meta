@@ -1,0 +1,212 @@
+fileFormatVersion: 2
+guid: 3965edeb3dc5b4865bf158f5a4c5cf95
+timeCreated: 1505016715
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: ankle_L
+    100002: ankle_R
+    100004: beard_R0C0
+    100006: beard_R1C0
+    100008: beard_R2C0
+    100010: bicep_L
+    100012: bicep_R
+    100014: clavicle_L
+    100016: clavicle_R
+    100018: ear0_0_L
+    100020: ear1_0_R
+    100022: earthshaker_base
+    100024: earthshaker_belt
+    100026: earthshaker_bracers
+    100028: //RootNode
+    100030: earthshaker_totem
+    100032: elbow_L
+    100034: elbow_R
+    100036: Flap_Left_R0C0
+    100038: Flap_Left_R1C0
+    100040: Flap_Left_R2C0
+    100042: Flap_Right_R0C0
+    100044: Flap_Right_R1C0
+    100046: Flap_Right_R2C0
+    100048: head
+    100050: index_0_L
+    100052: index_0_R
+    100054: index_1_L
+    100056: index_1_R
+    100058: index_2_L
+    100060: index_2_R
+    100062: joint8
+    100064: knee_L
+    100066: knee_R
+    100068: loincloth1_0
+    100070: mid_0_L
+    100072: mid_0_R
+    100074: mid_1_L
+    100076: mid_1_R
+    100078: mid_2_L
+    100080: mid_2_R
+    100082: neck1
+    100084: portrait
+    100086: root
+    100088: spine1
+    100090: spine2
+    100092: spine3
+    100094: strapFrontLf
+    100096: strapFrontRt
+    100098: thigh_L
+    100100: thigh_R
+    100102: thumb_0_L
+    100104: thumb_0_R
+    100106: thumb_1_L
+    100108: thumb_1_R
+    100110: thumb_2_L
+    100112: thumb_2_R
+    100114: Thumb_plc0_L
+    100116: toeBase_L
+    100118: toeBase_R
+    100120: totem_1
+    100122: wrist_L
+    100124: wrist_R
+    400000: ankle_L
+    400002: ankle_R
+    400004: beard_R0C0
+    400006: beard_R1C0
+    400008: beard_R2C0
+    400010: bicep_L
+    400012: bicep_R
+    400014: clavicle_L
+    400016: clavicle_R
+    400018: ear0_0_L
+    400020: ear1_0_R
+    400022: earthshaker_base
+    400024: earthshaker_belt
+    400026: earthshaker_bracers
+    400028: //RootNode
+    400030: earthshaker_totem
+    400032: elbow_L
+    400034: elbow_R
+    400036: Flap_Left_R0C0
+    400038: Flap_Left_R1C0
+    400040: Flap_Left_R2C0
+    400042: Flap_Right_R0C0
+    400044: Flap_Right_R1C0
+    400046: Flap_Right_R2C0
+    400048: head
+    400050: index_0_L
+    400052: index_0_R
+    400054: index_1_L
+    400056: index_1_R
+    400058: index_2_L
+    400060: index_2_R
+    400062: joint8
+    400064: knee_L
+    400066: knee_R
+    400068: loincloth1_0
+    400070: mid_0_L
+    400072: mid_0_R
+    400074: mid_1_L
+    400076: mid_1_R
+    400078: mid_2_L
+    400080: mid_2_R
+    400082: neck1
+    400084: portrait
+    400086: root
+    400088: spine1
+    400090: spine2
+    400092: spine3
+    400094: strapFrontLf
+    400096: strapFrontRt
+    400098: thigh_L
+    400100: thigh_R
+    400102: thumb_0_L
+    400104: thumb_0_R
+    400106: thumb_1_L
+    400108: thumb_1_R
+    400110: thumb_2_L
+    400112: thumb_2_R
+    400114: Thumb_plc0_L
+    400116: toeBase_L
+    400118: toeBase_R
+    400120: totem_1
+    400122: wrist_L
+    400124: wrist_R
+    4300000: earthshaker_base
+    4300002: earthshaker_bracers
+    4300004: earthshaker_belt
+    4300006: earthshaker_totem
+    9500000: //RootNode
+    13700000: earthshaker_base
+    13700002: earthshaker_belt
+    13700004: earthshaker_bracers
+    13700006: earthshaker_totem
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

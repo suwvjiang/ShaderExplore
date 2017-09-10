@@ -7,7 +7,7 @@
 		_BumpMap("Bump Map", 2D) = "bump"{}
 		_BumpScale("Bump Scale", Float) = 1
 		_SpecMap("Specular Map", 2D) = ""{}
-		_Gloss("Gloss", Float) = 4
+		_Gloss("Gloss", Range(0, 1)) = 1
 	}
 	SubShader
 	{
@@ -45,10 +45,10 @@
 		}
 
 		//diffuse = albedo * (1+(fd90-1)*pow((1-nl), 5))*(1+(f-1)*pow((1-nv), 5))
-		//fd90 = 0.5 + 2 * roughness * pow(lh, 2)
-		float DisneyDiffuse(float nl, float nv, float lh,float roughness)
+		//fd90 = 0.5 + 2 * preRoughness * pow(lh, 2)
+		float DisneyDiffuse(float nl, float nv, float lh,float preRoughness)
 		{
-			float fd90 = 0.5 + 2.0 * roughness * pow2(lh);
+			float fd90 = 0.5 + 2.0 * preRoughness * pow2(lh);
 			return Tdisney(nl, fd90) * Tdisney(nv, fd90);
 		}
 
@@ -58,12 +58,13 @@
 			return f0 + (1.0-f0) * pow5(1.0-lh);
 		}
 
-		//Dggx = a / (PI * pow(((a-1) * nh * nh + 1), 2));
+		//Dggx = a2 / (PI * pow(((a2-1) * nh * nh + 1), 2));
+		//a2 = a * a;
 		float Dggx(float nh, float roughness)
 		{
-			float a = pow4(roughness);
-			float t1 = (a - 1.0) * pow2(nh) + 1.0;
-			return a / (UNITY_PI * (pow2(t1) + 1e-7f));
+			float a2 = pow2(roughness);
+			float t = (a2 - 1.0) * pow2(nh) + 1.0;
+			return a2 / (UNITY_PI * pow2(t));
 		}
 
 		float Tg(float i, float k)
@@ -72,21 +73,23 @@
 		}
 		
 		//G(l, v) = G1(l) G1(v); 
-		//G1(x) = 1 / (nx*(1 - k) + k); k = pow(roughness, 2) * 0.5
+		//G1(x) = 1 / (nx*(1 - k) + k); k = sqrt(2 * a * a / pi) = a * sqrt(2/pi); a = roughness * roughness
 		//Smith-Schlick
-		float Gsmith(float nl, float nv, float roughness)
+		float Vss(float nl, float nv, float roughness)
 		{
-			float k = pow2(roughness) * 0.5;
-			return 1 / (Tg(nl, k) * Tg(nv, k) + 1e-5f);
+			half c = 0.797884560802865h; // c = sqrt(2 / pi)
+			float k = roughness * c;
+			return 1 / (Tg(nl, k) * Tg(nv, k));
 		}
 
-		float Gsmithggx(float nl, float nv, float roughness)
+		// GGX
+		float Vggx(float nl, float nv, float roughness)
 		{
 			half a = roughness;
 			half lambdaV = nl * (nv * (1 - a) + a);
 			half lambdaL = nv * (nl * (1 - a) + a);
 
-			return 0.5f / (lambdaV + lambdaL + 1e-5f);
+			return 2.0 / (lambdaV + lambdaL + 1e-5f);
 		}
 
 		struct a2v
@@ -155,11 +158,12 @@
 			float nh = saturate(dot(normal, h));
 
 			// sample the texture
-			fixed4 albedo = tex2D(_MainTex, i.uv);
+			fixed4 albedo = tex2D(_MainTex, i.uv) * _Color;
 			fixed4 spec = tex2D(_SpecMap, i.uv);
 
 			float smoothness = spec.a * _Gloss;
-			float roughness = 1-smoothness;
+			float perRoughness = 1-smoothness;
+			float roughness = pow2(perRoughness);
 			float oneMinusReflectivity = 1 - Reflectivity(spec);
 
 			//Conservation Energy
@@ -169,15 +173,20 @@
 			albedo.rgb *= albedo.a;
 			
 			//diffuse
-			float diffTerm = DisneyDiffuse(nl, nv, lh, roughness);
+			float diffTerm = DisneyDiffuse(nl, nv, lh, perRoughness);
 			diffTerm *= nl;
 			
-			//specular = F * D * G/(4*nl*nv)
+			//specular = F * D * G/(4*nl*nv) = F * D * V / 4
+			//其中V = G / (nl*nv)
 			float F = Fresnel(1-oneMinusReflectivity, lh);
+
 			float D = Dggx(nh, roughness);
-			float G = Gsmith(nl, nv, roughness)/4;
-			//float G = Gsmithggx(nl, nv, roughness);
-			float specTerm = F * D * G * UNITY_PI;
+			//float D = Dbp(nh, roughness);
+
+			float V = Vss(nl, nv, roughness);
+			//float V = Vggx(nl, nv, roughness);
+
+			float specTerm = F * D * V / 4 * UNITY_PI;
 			specTerm = max(0, specTerm * nl);
 
 			//shadow and atten

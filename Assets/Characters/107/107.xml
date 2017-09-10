@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<character name="20101" id="">
+	<animation name="idle" enable="1" start_frame="5" end_frame="45" description="非战斗待机1"/>
+	<animation name="wait_1" enable="1" start_frame="55" end_frame="127" description="非战斗待机2"/>
+	<animation name="wait_2" enable="1" start_frame="135" end_frame="190" description="非战斗待机3"/>
+	<animation name="jump" enable="0" start_frame="195" end_frame="227" description="非战斗跳跃"/>
+	<animation name="fall_down" enable="0" start_frame="235" end_frame="260" description="下落"/>
+	<animation name="fall_ground" enable="0" start_frame="265" end_frame="284" description="落地"/>
+	<animation name="run" enable="1" start_frame="3160" end_frame="3184" description="非战斗奔跑"/>
+	<animation name="battle_run_2" enable="1" start_frame="3190" end_frame="3214" description="战斗奔跑"/>
+	<animation name="battle_run_4" enable="1" start_frame="3190" end_frame="3214" description="战斗奔跑"/>
+	<animation name="battle_idle_2" enable="1" start_frame="370" end_frame="410" description="战斗待机_弓"/>
+	<animation name="battle_idle_4" enable="1" start_frame="370" end_frame="410" description="战斗待机_弓"/>
+	<animation name="stand_hit" enable="1" start_frame="415" end_frame="436" description="受击"/>
+	<animation name="dizzy" enable="1" start_frame="440" end_frame="470" description="眩晕受击"/>
+	<animation name="knock_hit" enable="0" start_frame="490" end_frame="513" description="击倒"/>
+	<animation name="Dead_Ground" enable="1" start_frame="513" end_frame="514" description="躺尸"/>
+	<animation name="stand_up" enable="0" start_frame="520" end_frame="545" description="击倒起身"/>
+	<animation name="back_hit" enable="0" start_frame="560" end_frame="584" description="击退"/>
+	<animation name="victory" enable="0" start_frame="660" end_frame="716" description="庆祝"/>
+	<animation name="battle_jump" enable="0" start_frame="720" end_frame="750" description="战斗跳跃"/>
+	<animation name="fail" enable="0" start_frame="755" end_frame="822" description="失败"/>
+	<animation name="attack_2" enable="1" start_frame="840" end_frame="870" description="普攻2_弓"/>
+	<animation name="skill_1" enable="1" start_frame="840" end_frame="870" description="技能1"/>
+	<animation name="skill_4" enable="1" start_frame="840" end_frame="870" description="技能4"/>
+	<animation name="skill_2" enable="1" start_frame="890" end_frame="920" description="技能2  多重射击"/>
+	<animation name="attack_4" enable="1" start_frame="950" end_frame="995" description="普通攻击4"/>
+	<animation name="attack_5" enable="1" start_frame="1020" end_frame="1055" description="普通攻击5"/>
+	<animation name="skill_5" enable="1" start_frame="1150" end_frame="1189" description="技能5   逃脱"/>
+	<animation name="skill_6" enable="1" start_frame="1190" end_frame="1240" description="技能6   夺命黑鸦"/>
+	<animation name="skill_3" enable="1" start_frame="1260" end_frame="1300" description="技能3"/>
+	<animation name="ride_idle" enable="1" start_frame="1320" end_frame="1340" description="坐骑"/>
+	<animation name="call_ride" enable="1" start_frame="1430" end_frame="1490" description="召唤坐骑"/>
+	<animation name="dead" enable="1" start_frame="1710" end_frame="1755" description="死亡"/>
+	<animation name="battle_idle_1" enable="1" start_frame="2060" end_frame="2100" description="战斗待机1_抢"/>
+	<animation name="battle_idle_3" enable="1" start_frame="2060" end_frame="2100" description="战斗待机3_弩"/>
+	<animation name="attack_3" enable="1" start_frame="2105" end_frame="2138" description="普攻3_弩"/>
+	<animation name="attack_1" enable="1" start_frame="2105" end_frame="2138" description="普攻1_枪"/>
+	<animation name="skill_12" enable="1" start_frame="2105" end_frame="2138" description="眼镜蛇射击,奥术射击"/>
+	<animation name="skill_7" enable="1" start_frame="2210" end_frame="2240" description="陷阱"/>
+	<animation name="skill_13" enable="1" start_frame="2140" end_frame="2185" description="群兽蹦腾"/>
+	<animation name="skill_8" enable="1" start_frame="2420" end_frame="2773" description="假死"/>
+	<animation name="battle_run_1" enable="1" start_frame="3220" end_frame="3244" description="战斗奔跑"/>
+	<animation name="battle_run_3" enable="1" start_frame="3220" end_frame="3244" description="战斗奔跑"/>
+	<animation name="appear" enable="1" start_frame="2808" end_frame="2971" description="出场"/>
+	<animation name="create" enable="1" start_frame="2808" end_frame="2971" description="出场"/>
+	<animation name="skill_14" enable="1" start_frame="2975" end_frame="3020" description="连环机关枪"/>
+	<animation name="skill_9" enable="1" start_frame="3025" end_frame="3077" description="新杀戮命令"/>
+	<animation name="skill_15" enable="1" start_frame="3080" end_frame="3112" description="新狂野怒火"/>
+	<animation name="skill_16" enable="1" start_frame="3115" end_frame="3152" description="新胁迫"/>
+</character>
