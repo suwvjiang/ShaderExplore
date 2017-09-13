@@ -6,16 +6,113 @@ Shader "Explore/MT"
 	{
 		_Color("Color", Color) = (0.79,0.79,0.79,1)
 		_MainTex("MainTex", 2D) = "white" {}
-		_BumpMap("BumpTex", 2D) = "bump" {}
+		_BumpTex("BumpTex", 2D) = "bump" {}
 		_BumpScale("Bump Scale", Float) = 1.0
-		_SpecMap("Specular Map", 2D) = "white" {}
-		_SpecScale("Specular Scale", Range(1.0, 32)) = 2
+		_Specular("Specular", 2D) = "white" {}
+		_SpeScale("Specular Scale", Range(1.0, 32)) = 2
 		_Gloss("Gloss", Range(8.0, 256)) = 140
+		_Emissive("Emissive", 2D) = "black" {}
+		[MaterialToggle]_Breath("Breath", Float) = 0
 	}
 	SubShader
 	{
-		LOD 200
+		LOD 400
 		Tags {"RenderType"="Opaque" "Queue"="Geometry+50"}
+
+		CGINCLUDE
+
+		#include "UnityCG.cginc"
+		#include "AutoLight.cginc"
+		
+		fixed4 _LightColor0;
+		fixed4 _Color;
+		sampler2D _MainTex; float4 _MainTex_ST;
+		sampler2D _BumpTex; float4 _BumpTex_ST;
+		sampler2D _Specular; float4 _Specular_ST;
+		sampler2D _Emissive; float4 _Emissive_ST;
+		float _BumpScale;
+		fixed _SpeScale;
+		float _Gloss;
+		fixed _Breath;
+		
+		struct a2v
+		{ 
+			float4 vertex :POSITION; 
+			float3 normal:NORMAL; 
+			float4 tangent:TANGENT; 
+			float4 texcoord:TEXCOORD0; 
+		};
+
+		struct v2f
+		{ 
+			float4 pos:SV_POSITION; 
+			float2 uv:TEXCOORD0; 
+			float3 lightDir:TEXCOORD1; 
+			float3 viewDir:TEXCOORD2;
+		};
+		
+		v2f vert(a2v v)
+		{
+			v2f o;
+			o.pos = UnityObjectToClipPos(v.vertex);
+			o.uv= TRANSFORM_TEX(v.texcoord, _MainTex);
+			TANGENT_SPACE_ROTATION;
+			o.lightDir = mul(rotation, ObjSpaceLightDir(v.vertex)).xyz;
+			o.viewDir = mul(rotation, ObjSpaceViewDir(v.vertex)).xyz;
+			
+			return o;
+		}
+		
+		fixed4 frag(v2f i):SV_Target
+		{
+			fixed3 lightDir = normalize(i.lightDir);
+			fixed3 viewDir = normalize(i.viewDir);
+			fixed3 halfDir = normalize(i.lightDir + i.viewDir);
+			
+			fixed3 normal = UnpackNormal(tex2D(_BumpTex, i.uv));
+			normal.xy *= _BumpScale;
+			normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
+
+			half nv = saturate(dot(normal, viewDir));
+			half nl = saturate(dot(normal, lightDir));
+			half nh = saturate(dot(normal, halfDir));
+			
+			fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
+			fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
+			fixed3 diffuse = _LightColor0.rgb * albedo * nv;
+			
+			fixed3 speValue = tex2D(_Specular, i.uv).rgb * _SpeScale;
+			fixed3 specular = _LightColor0.rgb * speValue.rgb * pow(nh, _Gloss);
+			
+			fixed3 emissive = tex2D(_Emissive, i.uv).rgb * ((_SinTime.z*0.5+0.5) * _Breath + (1-_Breath));
+			
+			fixed3 color = ambient + diffuse + specular + emissive;
+			return fixed4(color, 1);
+		}
+		
+		fixed4 fragAdd(v2f i):SV_Target
+		{
+			fixed3 lightDir = normalize(i.lightDir);
+			fixed3 viewDir = normalize(i.viewDir);
+			fixed3 halfDir = normalize(lightDir + viewDir);
+			
+			fixed3 normal = UnpackNormal(tex2D(_BumpTex, i.uv));
+			normal.xy *= _BumpScale;
+			normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
+
+			half nl = saturate(dot(normal, lightDir));
+			half nh = saturate(dot(normal, halfDir));
+			
+			fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
+			fixed3 diffuse = _LightColor0.rgb * albedo * nl;
+			
+			fixed3 speValue = tex2D(_Specular, i.uv).rgb * _SpeScale;
+			fixed3 specular = _LightColor0.rgb * speValue.rgb * pow(nh, _Gloss);
+			
+			return fixed4(diffuse + specular, 1);
+		}
+		ENDCG
+
 		Pass
 		{
 			Name "ForwardBase"
@@ -25,54 +122,6 @@ Shader "Explore/MT"
 			
 			#pragma vertex vert
 			#pragma fragment frag
-			
-			#include "UnityCG.cginc"
-			#include "AutoLight.cginc"
-			
-			fixed4 _LightColor0;
-			fixed4 _Color;
-			sampler2D _MainTex; float4 _MainTex_ST;
-			sampler2D _BumpTex; float4 _BumpTex_ST;
-			sampler2D _SpecMap; float4 _SpecMap_ST;
-			float _BumpScale;
-			fixed _SpeScale;
-			float _Gloss;
-			
-			struct a2v{ float4 vertex :POSITION; float3 normal:NORMAL; float4 tangent:TANGENT; float4 texcoord:TEXCOORD0; };
-			struct v2f{ float4 pos:SV_POSITION; float2 uv:TEXCOORD0; float3 lightDir:TEXCOORD1; float3 viewDir:TEXCOORD2;};
-			
-			v2f vert(a2v v)
-			{
-				v2f o;
-				o.pos = UnityObjectToClipPos(v.vertex);
-				o.uv= TRANSFORM_TEX(v.texcoord, _MainTex);
-				TANGENT_SPACE_ROTATION;
-				o.lightDir = mul(rotation, ObjSpaceLightDir(v.vertex)).xyz;
-				o.viewDir = mul(rotation, ObjSpaceViewDir(v.vertex)).xyz;
-				
-				return o;
-			}
-			
-			fixed4 frag(v2f i):SV_Target
-			{
-				fixed3 lightDir = normalize(i.lightDir);
-				fixed3 viewDir = normalize(i.viewDir);
-				
-				fixed3 normal = UnpackNormal(tex2D(_BumpTex, i.uv));
-				normal.xy *= _BumpScale;
-				normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
-				
-				fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
-				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
-				fixed3 diffuse = _LightColor0.rgb * albedo * saturate(dot(normal, lightDir));
-				
-				fixed3 halfDir = normalize(lightDir + viewDir);
-				fixed3 speValue = tex2D(_SpecMap, i.uv).rgb * _SpeScale;
-				fixed3 specular = _LightColor0.rgb * speValue.rgb * pow(saturate(dot(normal, halfDir)), _Gloss);
-			
-				return fixed4(ambient + diffuse + specular, 1);
-			}
-			
 			ENDCG
 		}
 
@@ -86,56 +135,10 @@ Shader "Explore/MT"
 			#pragma multi_compile_fwdadd
 			
 			#pragma vertex vert
-			#pragma fragment frag
-			
-			#include "UnityCG.cginc"
-			#include "AutoLight.cginc"
-			
-			fixed4 _LightColor0;
-			fixed4 _Color;
-			sampler2D _MainTex; float4 _MainTex_ST;
-			sampler2D _BumpTex; float4 _BumpTex_ST;
-			sampler2D _SpecMap; float4 _SpecMap_ST;
-			float _BumpScale;
-			fixed _SpeScale;
-			float _Gloss;
-			
-			struct a2v{ float4 vertex :POSITION; float3 normal:NORMAL; float4 tangent:TANGENT; float4 texcoord:TEXCOORD0; };
-			struct v2f{ float4 pos:SV_POSITION; float2 uv:TEXCOORD0; float3 lightDir:TEXCOORD1; float3 viewDir:TEXCOORD2; };
-			
-			v2f vert(a2v v)
-			{
-				v2f o;
-				o.pos = UnityObjectToClipPos(v.vertex);
-				o.uv= TRANSFORM_TEX(v.texcoord, _MainTex);
-				TANGENT_SPACE_ROTATION;
-				o.lightDir = mul(rotation, ObjSpaceLightDir(v.vertex)).xyz;
-				o.viewDir = mul(rotation, ObjSpaceViewDir(v.vertex)).xyz;
-				
-				return o;
-			}
-			
-			fixed4 frag(v2f i):SV_Target
-			{
-				fixed3 lightDir = normalize(i.lightDir);
-				fixed3 viewDir = normalize(i.viewDir);
-				
-				fixed3 normal = UnpackNormal(tex2D(_BumpTex, i.uv));
-				normal.xy *= _BumpScale;
-				normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
-				
-				fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
-				fixed3 diffuse = _LightColor0.rgb * albedo * saturate(dot(normal, lightDir));
-				
-				fixed3 halfDir = normalize(lightDir + viewDir);
-				fixed3 speValue = tex2D(_SpecMap, i.uv).rgb * _SpeScale;
-				fixed3 specular = _LightColor0.rgb * speValue.rgb * pow(saturate(dot(normal, halfDir)), _Gloss);
-				
-				return fixed4(diffuse + specular, 1);
-			}
+			#pragma fragment fragAdd
 			ENDCG
 		}
 	}
-
-    FallBack "Mobile/VertexLit"
+	
+	Fallback "Specular"
 }
