@@ -20,6 +20,9 @@
 		#include "AutoLight.cginc"
 		#include "Lighting.cginc"
 
+#define ColorSpaceDielectricSpec half4(0.04, 0.04, 0.04, 1.0 - 0.04)
+#define UNITY_SPECCUBE_LOD_STEPS (6)
+
 		float pow2(float i)
 		{
 			return i * i;
@@ -38,6 +41,12 @@
 		float Reflectivity(fixed3 spec)
 		{
 			return max(max(spec.r, spec.g), spec.b);
+		}
+
+		//根据光滑程序设置反射的清晰度
+		float RoughnessToMip(float perRoughness)
+		{
+			return perRoughness * (1.7 - 0.7 * perRoughness) * UNITY_SPECCUBE_LOD_STEPS;
 		}
 
 		float Tdisney(float i, float fd90)
@@ -66,6 +75,17 @@
 			float a2 = pow2(roughness);
 			float t = (a2 - 1.0) * pow2(nh) + 1.0;
 			return a2 / (UNITY_PI * pow2(t));
+		}
+
+		float RoughnessToSpecPower(float roughness)
+		{
+			return 2.0 / pow2(roughness) - 2.0;
+		}
+
+		float Dblinn(float nh, float roughness)
+		{
+			float k = RoughnessToSpecPower(roughness);
+			return (k+2) / (2 * UNITY_PI) * pow(nh, k);
 		}
 
 		float Tg(float i, float k)
@@ -153,6 +173,7 @@
 			float3 light = normalize(UnityWorldSpaceLightDir(pos));
 			float3 view = normalize(UnityWorldSpaceViewDir(pos));
 			float3 h = normalize(light+view);
+			float3 refDir = reflect(-view, normal);
 
 			float nl = saturate(dot(normal, light));
 			float nv = abs(dot(normal, view));
@@ -168,8 +189,12 @@
 			float roughness = pow2(perRoughness);
 			float oneMinusReflectivity = 1 - Reflectivity(spec);
 
+			float mip = RoughnessToMip(perRoughness);
+			fixed4 reflectColor = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, refDir, mip);
+			
+			albedo = lerp(reflectColor, albedo, oneMinusReflectivity);
 			//Conservation Energy
-			albedo = albedo * oneMinusReflectivity;
+			//albedo = albedo * oneMinusReflectivity;
 
 			//PreMultiplyAlpha
 			albedo.rgb *= albedo.a;

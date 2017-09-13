@@ -194,7 +194,7 @@
 			// sample the texture
 			//fixed4 reflectColor = texCUBE(_CubeMap, refDir);
 			float mip = RoughnessToMip(perRoughness);
-			fixed4 reflectColor = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0,refDir, mip);
+			fixed4 reflectColor = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, refDir, mip);
 			fixed4 albedo = tex2D(_MainTex, i.uv) * _Color;
 			fixed3 specColor = lerp(ColorSpaceDielectricSpec.rgb, albedo.rgb, _Metallic);
 
@@ -228,6 +228,9 @@
 			fixed3 diffuse = albedo * _LightColor0.rgb * diffTerm * atten;
 			fixed3 specular = specColor * _LightColor0.rgb * specTerm * atten;
 			fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
+
+			//float surfaceRedution = 1.0 / (pow2(roughness) + 1.0);
+			//float grazingTerm = saturate(smoothness + 1 - oneMinusReflectivity);
 
 			fixed3 finishC = diffuse + specular + ambient;
 
