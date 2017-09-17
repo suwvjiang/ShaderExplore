@@ -103,6 +103,7 @@
 
 		Pass
 		{
+			Cull off
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
