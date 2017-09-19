@@ -23,7 +23,7 @@
 		Tags { "RenderType"="Transparent" "Queue"="Transparent"}
 		LOD 100
 
-		GrabPass {"_GrabTexure"}
+		GrabPass {"_RefractTexture"}
 
 		CGINCLUDE
 
@@ -62,7 +62,7 @@
 		sampler2D _WaveMap; float4 _WaveMap_ST;
 		sampler2D _NoiseMap; float4 _NoiseMap_ST;
 		sampler2D _CameraDepthTexture;
-		sampler2D _GrabTexure;
+		sampler2D _RefractTexture;
 		samplerCUBE _CubeMap;
 		float4 _RangeInfos;
 		float _RefractRatio;//折射率
@@ -80,6 +80,8 @@
 			o.pos = UnityObjectToClipPos(v.vertex);
 			o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 			o.proj = ComputeGrabScreenPos(o.pos);
+			COMPUTE_EYEDEPTH(o.proj.z);
+
 			float3 pos = mul(unity_ObjectToWorld, v.vertex);
 			float3 normal = UnityObjectToWorldNormal(v.normal);
 			float3 tangent = UnityObjectToWorldDir(v.tangent);
@@ -117,7 +119,7 @@
 			float4 offsetMap = (tex2D(_BumpMap, i.uv + waterOffset) + tex2D(_BumpMap, VerticallyUV(i.uv) + waterOffset)) * 0.5;
 			float2 offset = UnpackNormal(offsetMap).xy * _RefractRatio;
 
-			fixed3 refractColor = tex2D(_GrabTexure, uv + offset * depthPer * 0.5);
+			fixed3 refractColor = tex2D(_RefractTexture, uv + offset * depthPer * 0.5);
 
 			float3 noise = tex2D(_NoiseMap, i.uv);
 
