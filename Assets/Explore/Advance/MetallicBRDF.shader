@@ -7,8 +7,7 @@
 		_BumpMap("Bump Map", 2D) = "bump"{}
 		_BumpScale("Bump Scale", Float) = 1
 		[Gamma]_Metallic("Metallic", Range(0, 1)) = 1
-		_Gloss("Gloss", Range(0, 1)) = 1
-		_CubeMap("CubeMap",CUBE) = ""{}
+		_Gloss("Smoothness", Range(0, 1)) = 1
 	}
 	SubShader
 	{
@@ -191,16 +190,14 @@
 			float roughness = pow2(perRoughness);
 			float oneMinusReflectivity = MetalluicOneMinusReflectivity(_Metallic);
 
+			fixed4 albedo = _Color;//tex2D(_MainTex, i.uv) * _Color;
+			fixed3 specColor = lerp(ColorSpaceDielectricSpec.rgb, albedo.rgb, _Metallic);
+			//Conservation Energy
+			albedo = albedo * oneMinusReflectivity;
+
 			// sample the texture
-			//fixed4 reflectColor = texCUBE(_CubeMap, refDir);
 			float mip = RoughnessToMip(perRoughness);
 			fixed4 reflectColor = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, refDir, mip);
-			fixed4 albedo = tex2D(_MainTex, i.uv) * _Color;
-			fixed3 specColor = lerp(ColorSpaceDielectricSpec.rgb, albedo.rgb, _Metallic);
-
-			albedo = lerp(reflectColor, albedo, 1 - _Metallic);
-			//Conservation Energy
-			//albedo = albedo * oneMinusReflectivity;
 
 			//PreMultiplyAlpha
 			albedo.rgb *= albedo.a;
@@ -229,10 +226,10 @@
 			fixed3 specular = specColor * _LightColor0.rgb * specTerm * atten;
 			fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
 
-			//float surfaceRedution = 1.0 / (pow2(roughness) + 1.0);
-			//float grazingTerm = saturate(smoothness + 1 - oneMinusReflectivity);
-
-			fixed3 finishC = diffuse + specular + ambient;
+			float surfaceReduction = 1.0 / (pow2(roughness) + 1.0);
+			float grazingTerm = saturate(smoothness + 1 - oneMinusReflectivity);
+			fixed3 indirct = surfaceReduction * reflectColor * FresnelLerp (specColor, grazingTerm, nv);
+			fixed3 finishC = diffuse + specular + ambient + indirct;
 
 			return fixed4(finishC, 1);
 		}

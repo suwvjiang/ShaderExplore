@@ -65,11 +65,11 @@ Shader "Explore/MT"
 		
 		fixed4 frag(v2f i):SV_Target
 		{
-			fixed3 lightDir = normalize(i.lightDir);
-			fixed3 viewDir = normalize(i.viewDir);
-			fixed3 halfDir = normalize(i.lightDir + i.viewDir);
+			half3 lightDir = normalize(i.lightDir);
+			half3 viewDir = normalize(i.viewDir);
+			half3 halfDir = normalize(i.lightDir + i.viewDir);
 			
-			fixed3 normal = UnpackNormal(tex2D(_BumpTex, i.uv));
+			half3 normal = UnpackNormal(tex2D(_BumpTex, i.uv));
 			normal.xy *= _BumpScale;
 			normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
 
@@ -77,39 +77,42 @@ Shader "Explore/MT"
 			half nl = saturate(dot(normal, lightDir));
 			half nh = saturate(dot(normal, halfDir));
 			
-			fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
-			fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
-			fixed3 diffuse = _LightColor0.rgb * albedo * nv;
+			half3 albedo = tex2D(_MainTex, i.uv).rgb;
+			albedo = GammaToLinearSpace(albedo) * _Color.rgb;
+			half3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
+			half3 diffuse = _LightColor0.rgb * albedo * nv;
 			
-			fixed3 speValue = tex2D(_Specular, i.uv).rgb * _SpeScale;
-			fixed3 specular = _LightColor0.rgb * speValue.rgb * pow(nh, _Gloss);
+			half3 speValue = tex2D(_Specular, i.uv).rgb * _SpeScale;
+			half3 specular = _LightColor0.rgb * speValue.rgb * pow(nh, _Gloss);
 			
-			fixed3 emissive = tex2D(_Emissive, i.uv).rgb * ((_SinTime.z*0.5+0.5) * _Breath + (1-_Breath));
+			half3 emissive = tex2D(_Emissive, i.uv).rgb * ((_SinTime.z*0.5+0.5) * _Breath + (1-_Breath));
 			
-			fixed3 color = ambient + diffuse + specular + emissive;
+			half3 color = ambient + diffuse + specular + emissive;
 			return fixed4(color, 1);
 		}
 		
 		fixed4 fragAdd(v2f i):SV_Target
 		{
-			fixed3 lightDir = normalize(i.lightDir);
-			fixed3 viewDir = normalize(i.viewDir);
-			fixed3 halfDir = normalize(lightDir + viewDir);
+			half3 lightDir = normalize(i.lightDir);
+			half3 viewDir = normalize(i.viewDir);
+			half3 halfDir = normalize(lightDir + viewDir);
 			
-			fixed3 normal = UnpackNormal(tex2D(_BumpTex, i.uv));
+			half3 normal = UnpackNormal(tex2D(_BumpTex, i.uv));
 			normal.xy *= _BumpScale;
 			normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
 
 			half nl = saturate(dot(normal, lightDir));
 			half nh = saturate(dot(normal, halfDir));
 			
-			fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
-			fixed3 diffuse = _LightColor0.rgb * albedo * nl;
+			half3 albedo = tex2D(_MainTex, i.uv).rgb;
+			albedo = GammaToLinearSpace(albedo) * _Color.rgb;
+			half3 diffuse = _LightColor0.rgb * albedo * nl;
 			
-			fixed3 speValue = tex2D(_Specular, i.uv).rgb * _SpeScale;
-			fixed3 specular = _LightColor0.rgb * speValue.rgb * pow(nh, _Gloss);
-			
-			return fixed4(diffuse + specular, 1);
+			half3 speValue = tex2D(_Specular, i.uv).rgb * _SpeScale;
+			half3 specular = _LightColor0.rgb * speValue.rgb * pow(nh, _Gloss);
+			half3 color = diffuse + specular;
+
+			return fixed4(color, 1);
 		}
 		ENDCG
 

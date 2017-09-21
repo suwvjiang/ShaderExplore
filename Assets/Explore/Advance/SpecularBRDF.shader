@@ -8,7 +8,7 @@
 		_BumpScale("Bump Scale", Float) = 1
 		_Specular("Specular Map", 2D) = ""{}
 		_SpecularColor("Specular Color", Color) = (1,1,1,1)
-		_Gloss("Gloss", Range(0, 1)) = 1
+		_Gloss("Smoothness", Range(0, 1)) = 1
 	}
 	SubShader
 	{
@@ -182,19 +182,17 @@
 
 			// sample the texture
 			fixed4 albedo = tex2D(_MainTex, i.uv) * _Color;
-			fixed4 spec = _SpecularColor;//tex2D(_Specular, i.uv);
+			fixed4 specColor = _SpecularColor;//tex2D(_Specular, i.uv);
 
-			float smoothness = spec.a * _Gloss;
+			float smoothness = _Gloss;
 			float perRoughness = 1-smoothness;
 			float roughness = pow2(perRoughness);
-			float oneMinusReflectivity = 1 - Reflectivity(spec);
+			float oneMinusReflectivity = 1 - Reflectivity(specColor);
+			//Conservation Energy
+			albedo = albedo * oneMinusReflectivity;
 
 			float mip = RoughnessToMip(perRoughness);
 			fixed4 reflectColor = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, refDir, mip);
-			
-			albedo = lerp(reflectColor, albedo, oneMinusReflectivity);
-			//Conservation Energy
-			//albedo = albedo * oneMinusReflectivity;
 
 			//PreMultiplyAlpha
 			albedo.rgb *= albedo.a;
@@ -220,10 +218,13 @@
 			UNITY_LIGHT_ATTENUATION(atten, i, pos);
 
 			fixed3 diffuse = albedo * _LightColor0.rgb * diffTerm * atten;
-			fixed3 specular = spec * _LightColor0.rgb * specTerm * atten;
+			fixed3 specular = specColor * _LightColor0.rgb * specTerm * atten;
 			fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
 
-			fixed3 finishC = diffuse + specular + ambient;
+			float surfaceReduction = 1.0 / (pow2(roughness) + 1.0);
+			float grazingTerm = saturate(smoothness + 1 - oneMinusReflectivity);
+			fixed3 indirct = surfaceReduction * reflectColor * FresnelLerp (specColor, grazingTerm, nv);
+			fixed3 finishC = diffuse + specular + ambient + indirct;
 
 			return fixed4(finishC, 1);
 		}
