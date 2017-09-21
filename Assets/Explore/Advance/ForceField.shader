@@ -3,7 +3,7 @@
 	Properties
 	{
 		_Color("Color", Color) = (1,1,1,1)
-		_Amount("Amount", Range(0, 1)) = 0.5
+		_Amount("Amount", Range(0, 5)) = 2
 		_Depth("Depth", Range(0, 1)) = 0.2
 		_IntersectPower("Intersect Power", Range(0, 8)) = 2
 		_NoiseTex("Noise Tex", 2D) = ""{}
@@ -72,7 +72,7 @@
 			float offset = depth - i.proj.z;
 
 			half nv = abs(dot(normal, view));
-			half rim = (1 - nv) * _Amount;
+			half rim = pow(1 - nv, _Amount);
 			half intersect = pow((_Depth-offset), _IntersectPower);
 			half4 color = _Color * max(rim, intersect);
 
@@ -116,6 +116,7 @@
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
+			#pragma target 3.0
 			
 			ENDCG
 		}
