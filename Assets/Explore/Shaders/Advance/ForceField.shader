@@ -76,7 +76,7 @@
 			half intersect = pow((_Depth-offset), _IntersectPower);
 			half4 color = _Color * max(rim, intersect);
 
-			fixed2 noise = tex2D(_NoiseTex, i.uv + _Time.xy * _DisTimeFactor).xy * _DisWidth;
+			fixed2 noise = (tex2D(_NoiseTex, i.uv + _Time.xy * _DisTimeFactor).xy * 2 - 1) * _DisWidth;
 			i.screenPos.xy += noise;
 			half4 field = tex2Dproj(_FieldTexture, i.screenPos);
 //			color += field;
