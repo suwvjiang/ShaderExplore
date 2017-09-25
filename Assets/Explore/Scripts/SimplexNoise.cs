@@ -475,7 +475,8 @@ public class SimplexNoise
  
 		return noiseSum / (float)totalIterations;
 	}
- 
+    
+    //二方连续
 	//X, Y is [0..1]
 	public static float SeamlessNoise( float x, float y, float dx, float dy, float xyOffset ) 
 	{
@@ -490,7 +491,7 @@ public class SimplexNoise
 	    return Noise(nx, ny, nz, nw);
 	}
 
-	//
+	//分形叠加
 	public static float OctaveNoise(float x, float y, int octaves, float persistence) 
 	{
 		float total = 0;
