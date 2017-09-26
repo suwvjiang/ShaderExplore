@@ -43,11 +43,18 @@ public class CreateNoise : ScriptableWizard
 				float x = i * cell;
 				float y = j * cell;
 
-				if(Type == NoiseType.SimplexNoise)
+				if(Type == NoiseType.PerlinNoise)
 				{
 					x *= Scale;
 					y *= Scale;
-					noise *= SimplexNoise.OctaveNoise(x, y, Offset, 0.5f);
+					noise *= NoiseUtils.PerlinNoise(x, y, 0);
+				}
+				else if(Type == NoiseType.SimplexNoise)
+				{
+					x *= Scale;
+					y *= Scale;
+					noise *= NoiseUtils.SimplexNoise(x, y, 0f);
+					//noise *= SimplexNoise.Noise(x, y, 0f);
 				}
 				else if(Type == NoiseType.SeamlessNoise)
 				{
