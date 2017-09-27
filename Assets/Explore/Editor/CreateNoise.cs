@@ -47,28 +47,28 @@ public class CreateNoise : ScriptableWizard
 				{
 					x *= Scale;
 					y *= Scale;
-					noise *= NoiseUtils.PerlinNoise(x, y, 0);
+					noise *= NoiseUtils.Noise(NoiseEnum.Perlin, x, y, 0);
+					//noise *= (float)perlin.perlin(x, y, 0);
 				}
 				else if(Type == NoiseType.SimplexNoise)
 				{
 					x *= Scale;
 					y *= Scale;
-					noise *= NoiseUtils.SimplexNoise(x, y, 0f);
-					//noise *= SimplexNoise.Noise(x, y, 0f);
+					noise *= NoiseUtils.Noise(NoiseEnum.Simplex, x, y, 0f);
 				}
 				else if(Type == NoiseType.SeamlessNoise)
 				{
-					noise *= SimplexNoise.SeamlessNoise(x, y, Scale, Scale, Offset);
+					noise *= NoiseUtils.SeamlessNoise(x, y, Scale, Scale, Offset);
 				}
 				else if(Type == NoiseType.SunDirction)
 				{
 					float a = Mathf.Sqrt(SunDir.x * SunDir.x + SunDir.y * SunDir.y);
 					float b = Mathf.Sqrt(Vector3.Dot(SunDir, SunDir));
 					float step = a / (3 * b);
-					noise.x = SimplexNoise.SeamlessNoise(x, y, Scale, Scale, 0);
-					noise.y = SimplexNoise.SeamlessNoise(x, y, Scale, Scale, step);
-					noise.z = SimplexNoise.SeamlessNoise(x, y, Scale, Scale, step * 2);
-					noise.w = SimplexNoise.SeamlessNoise(x, y, Scale, Scale, step * 3);
+					noise.x = NoiseUtils.SeamlessNoise(x, y, Scale, Scale, 0);
+					noise.y = NoiseUtils.SeamlessNoise(x, y, Scale, Scale, step);
+					noise.z = NoiseUtils.SeamlessNoise(x, y, Scale, Scale, step * 2);
+					noise.w = NoiseUtils.SeamlessNoise(x, y, Scale, Scale, step * 3);
 				}
 				noise = (noise + Vector4.one) * 0.5f;
 				texture.SetPixel(i, j, Color.white * noise);

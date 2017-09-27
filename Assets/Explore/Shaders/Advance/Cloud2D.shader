@@ -132,11 +132,11 @@
 				fixed4 fbm = noise1 * 0.5 + noise2 * 0.25 + noise3 * 0.125 + noise4 * 0.0625;
 				fbm = (clamp(fbm, _Emptiness, _Shapeness) - _Emptiness)/(_Shapeness - _Emptiness);
 
-				fixed4 ray = (0, 0.1, 0.2, 0.4);
+				fixed4 ray = (0, 0.2, 0.4, 0.6);
 				fixed amount = dot(max(fbm - ray, 0), (0.25, 0.25, 0.25, 0.25));
 
 				fixed4 color;
-				color.rgb = _CloudColor.rgb * amount + 0.8 * (1-amount);
+				color.rgb = _CloudColor.rgb * amount;
 				color.a = amount * 1.5;
 				return color;
 			}

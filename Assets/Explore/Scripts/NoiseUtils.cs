@@ -3,10 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public delegate float FadeFunction(float t);
+public delegate float NoiseFunction(float x);
+public delegate float Noise2DFunction(float x, float y);
+public delegate float Noise3DFunction(float x, float y, float z);
+public delegate float Noise4DFunction(float x, float y, float z, float w);
+
+public enum NoiseEnum
+{
+	Perlin,
+	Value,
+	Simplex,
+}
+
+/// <summary>
+/// 噪声集合类
+/// design by jiangchufei@gmail.com
+/// date:2017-9-27
+/// </summary> 
 
 public class NoiseUtils
 {
-	private static readonly int[] permutation = 
+	static private readonly int[] permutation = 
 	{ 
 		151,160,137, 91, 90, 15,131, 13,201, 95, 96, 53,194,233,  7,225,// Hash lookup table as defined by Ken Perlin.  This is a randomly
 		140, 36,103, 30, 69,142,  8, 99, 37,240, 21, 10, 23,190,  6,148,// arranged array of all numbers from 0-255 inclusive.
@@ -26,14 +43,84 @@ public class NoiseUtils
 		222,114, 67, 29, 24, 72,243,141,128,195, 78, 66,215, 61,156,180
 	};
 
-	private static int[] p = new int[512];
+	static private int[] p = new int[512];
+
+    static private int[][] grad3 = new int[][]{
+						new int[]{1, 1, 0},
+						new int[]{-1, 1, 0},
+                        new int[]{1, -1, 0},
+						new int[]{-1, -1, 0},
+						new int[]{1, 0, 1},
+						new int[]{-1, 0, 1},
+                        new int[]{1, 0, -1},
+						new int[]{-1, 0, -1},
+						new int[]{0, 1, 1},
+						new int[]{0, -1, 1},
+                        new int[]{0, 1, -1},
+						new int[]{0, -1, -1} };
+ 
+    static private int[][] grad4 = new int[][]{
+						new int[]{ 0, 1, 1, 1 },
+						new int[]{ 0, 1, 1, -1 },
+                        new int[]{ 0, 1, -1, 1 },
+						new int[]{ 0, 1, -1, -1 },
+						new int[]{ 0, -1, 1, 1 },
+                        new int[]{ 0, -1, 1, -1 },
+						new int[]{ 0, -1, -1, 1 },
+						new int[]{ 0, -1, -1, -1 },
+                        new int[]{ 1, 0, 1, 1 },
+						new int[]{ 1, 0, 1, -1 },
+						new int[]{ 1, 0, -1, 1 },
+						new int[]{ 1, 0, -1, -1 },
+                        new int[]{ -1, 0, 1, 1 },
+						new int[]{ -1, 0, 1, -1 },
+						new int[]{ -1, 0, -1, 1 },
+                        new int[]{ -1, 0, -1, -1 },
+						new int[]{ 1, 1, 0, 1 },
+						new int[]{ 1, 1, 0, -1 },
+                        new int[]{ 1, -1, 0, 1 },
+						new int[]{ 1, -1, 0, -1 },
+						new int[]{ -1, 1, 0, 1 },
+                        new int[]{ -1, 1, 0, -1 },
+						new int[]{ -1, -1, 0, 1 },
+						new int[]{ -1, -1, 0, -1 },
+                        new int[]{ 1, 1, 1, 0 },
+						new int[]{ 1, 1, -1, 0 },
+						new int[]{ 1, -1, 1, 0 },
+						new int[]{ 1, -1, -1, 0 },
+                        new int[]{ -1, 1, 1, 0 },
+						new int[]{ -1, 1, -1, 0 },
+						new int[]{ -1, -1, 1, 0 },
+                        new int[]{ -1, -1, -1, 0 } };
+ 
+    // A lookup table to traverse the simplex around a given point in 4D.
+    // Details can be found where this table is used, in the 4D Noise method.
+    static private int[][] simplex = new int[][]{
+        new int[]{0,1,2,3}, new int[]{0,1,3,2}, new int[]{0,0,0,0}, new int[]{0,2,3,1}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{1,2,3,0},
+        new int[]{0,2,1,3}, new int[]{0,0,0,0}, new int[]{0,3,1,2}, new int[]{0,3,2,1}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{1,3,2,0},
+        new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0},
+        new int[]{1,2,0,3}, new int[]{0,0,0,0}, new int[]{1,3,0,2}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{2,3,0,1}, new int[]{2,3,1,0},
+        new int[]{1,0,2,3}, new int[]{1,0,3,2}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{2,0,3,1}, new int[]{0,0,0,0}, new int[]{2,1,3,0},
+        new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0},
+        new int[]{2,0,1,3}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{3,0,1,2}, new int[]{3,0,2,1}, new int[]{0,0,0,0}, new int[]{3,1,2,0},
+        new int[]{2,1,0,3}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{0,0,0,0}, new int[]{3,1,0,2}, new int[]{0,0,0,0}, new int[]{3,2,0,1}, new int[]{3,2,1,0}};
+
+	//Fn = (sqrt(n+1)-1)/n
+	//Gn = (n+1 - sqrt(n+1))/(n * (n+1))
+	private const float F2 = 0.366025404f;
+    private const float G2 = 0.211324865f;
+	private const float F3 = 0.333333333f;
+	private const float G3 = 0.166666667f;
+	private const float F4 = 0.309017f;
+	private const float G4 = 0.1381966f;
+
 	static NoiseUtils()
 	{
 		for( int i = 0; i < 512; i++ )
             p[i] = permutation[i & 255];
 	}
 
-	private static int fastfloor( float x )
+	static private int fastfloor( float x )
     {
         return x > 0 ? ( int )x : ( int )x - 1;
     }
@@ -42,17 +129,17 @@ public class NoiseUtils
 		return a * (1-t) + b * t;
 	}
 
-    private static float dot( int[] g, float x, float y )
+    static private float dot( int[] g, float x, float y )
     {
         return g[0] * x + g[1] * y;
     }
 
-    private static float dot( int[] g, float x, float y, float z )
+    static private float dot( int[] g, float x, float y, float z )
     {
         return g[0] * x + g[1] * y + g[2] * z;
     }
 
-    private static float dot( int[] g, float x, float y, float z, float w )
+    static private float dot( int[] g, float x, float y, float z, float w )
     {
         return g[0] * x + g[1] * y + g[2] * z + g[3] * w;
     }
@@ -128,12 +215,12 @@ public class NoiseUtils
 	}
 
 	//暂无执行函数
-	static public float PerlinNoise(float x, float y)
+	static private float PerlinNoise(float x, float y)
 	{
-		return 0;
+		return Mathf.PerlinNoise(x, y);
 	}
 
-	static public float PerlinNoise(float x, float y, float z)
+	static private float PerlinNoise(float x, float y, float z)
 	{
 		int ix = Mathf.FloorToInt(x);
 		int iy = Mathf.FloorToInt(y);
@@ -177,99 +264,6 @@ public class NoiseUtils
 		return (lerp(lerp4, lerp5, w) + 1) * 0.5f;
 	}
 
-	//分形叠加
-	//octave 倍率
-	//frequency 频率
-	//amplitudy 振幅
-	static public float OctavePerlin(float x, float y, int octave, float frequency, float amplitude)
-	{
-		float sum = 0;
-		float freq = 1f;
-		float amp = 1f;
-		for(int i = 0; i < octave; ++i)
-		{
-			sum += PerlinNoise(x * freq, y * freq) * amp;
-			freq *= frequency;
-			amp *= amplitude;
-		}
-
-		return sum;
-	}
-
-	//分形叠加
-	//octave 倍率
-	//frequency 频率
-	//amplitudy 振幅
-	static public float OctavePerlin(float x, float y, float z, int octave, float frequency, float amplitude)
-	{
-		float sum = 0;
-		float freq = 1f;
-		float amp = 1f;
-		for(int i = 0; i < octave; ++i)
-		{
-			sum += PerlinNoise(x * freq, y * freq, z * freq) * amp;
-			freq *= frequency;
-			amp *= amplitude;
-		}
-
-		return sum;
-	}
-
-    private static int[][] grad3 = new int[][]{
-						new int[]{1, 1, 0},
-						new int[]{-1, 1, 0},
-                        new int[]{1, -1, 0},
-						new int[]{-1, -1, 0},
-						new int[]{1, 0, 1},
-						new int[]{-1, 0, 1},
-                        new int[]{1, 0, -1},
-						new int[]{-1, 0, -1},
-						new int[]{0, 1, 1},
-						new int[]{0, -1, 1},
-                        new int[]{0, 1, -1},
-						new int[]{0, -1, -1} };
- 
-    private static int[][] grad4 = new int[][]{
-						new int[]{ 0, 1, 1, 1 },
-						new int[]{ 0, 1, 1, -1 },
-                        new int[]{ 0, 1, -1, 1 },
-						new int[]{ 0, 1, -1, -1 },
-						new int[]{ 0, -1, 1, 1 },
-                        new int[]{ 0, -1, 1, -1 },
-						new int[]{ 0, -1, -1, 1 },
-						new int[]{ 0, -1, -1, -1 },
-                        new int[]{ 1, 0, 1, 1 },
-						new int[]{ 1, 0, 1, -1 },
-						new int[]{ 1, 0, -1, 1 },
-						new int[]{ 1, 0, -1, -1 },
-                        new int[]{ -1, 0, 1, 1 },
-						new int[]{ -1, 0, 1, -1 },
-						new int[]{ -1, 0, -1, 1 },
-                        new int[]{ -1, 0, -1, -1 },
-						new int[]{ 1, 1, 0, 1 },
-						new int[]{ 1, 1, 0, -1 },
-                        new int[]{ 1, -1, 0, 1 },
-						new int[]{ 1, -1, 0, -1 },
-						new int[]{ -1, 1, 0, 1 },
-                        new int[]{ -1, 1, 0, -1 },
-						new int[]{ -1, -1, 0, 1 },
-						new int[]{ -1, -1, 0, -1 },
-                        new int[]{ 1, 1, 1, 0 },
-						new int[]{ 1, 1, -1, 0 },
-						new int[]{ 1, -1, 1, 0 },
-						new int[]{ 1, -1, -1, 0 },
-                        new int[]{ -1, 1, 1, 0 },
-						new int[]{ -1, 1, -1, 0 },
-						new int[]{ -1, -1, 1, 0 },
-                        new int[]{ -1, -1, -1, 0 } };
- 
-    //Fn = (1-sqrt(n+1))/n
-	//Gn = (n+1 - sqrt(n+1))/(n * (n+1))
-	private const float F2 = 0.366025404f;
-    private const float G2 = 0.211324865f;
-	private const float F3 = 0.333333333f;
-	private const float G3 = 0.166666667f;
-
 	static private int SimplexHash(int x, int y)
 	{
 		return p[x + p[y]] % 12;
@@ -312,7 +306,7 @@ public class NoiseUtils
 		return t * t * dot(grad4[hash], x, y, z, w);
 	}
 
-	static public float SimplexNoise(float x, float y)
+	static private float SimplexNoise(float x, float y)
 	{
 		//after transform's origin point
 		float xt = x + (x + y) * F2;
@@ -357,19 +351,16 @@ public class NoiseUtils
 		float n1 = SimplexGradient(SimplexHash(ixt+i, iyt+j), fx1, fy1);
 		float n2 = SimplexGradient(SimplexHash(ixt+1, iyt+1), fx2, fy2);
 
-		return 70f * (n+n1+n2);
+		float noise = 70f * (n+n1+n2);//[-1, 1]
+		return (noise + 1) * 0.5f;
 	}
 
-	static public float SimplexNoise(float x, float y, float z)
+	static private float SimplexNoise(float x, float y, float z)
 	{
 		float f = (x + y + z) * F3;
-		float xt = x + f;
-		float yt = y + f;
-		float zt = z + f;
-
-		int ixt = fastfloor(xt);
-		int iyt = fastfloor(yt);
-		int izt = fastfloor(zt);
+		int ixt = fastfloor(x + f);
+		int iyt = fastfloor(y + f);
+		int izt = fastfloor(z + f);
 
 		float g = (ixt + iyt + izt) * G3;
 		float x0 = ixt - g;
@@ -382,9 +373,9 @@ public class NoiseUtils
 
 		int i1, j1, k1;
 		int i2, j2, k2;
-		if(x >= y)
+		if(fx0 >= fy0)
 		{
-			if(y >= z)//xyz
+			if(fy0 >= fz0)//xyz
 			{
 				i1 = 1;
 				j1 = 0;
@@ -393,7 +384,7 @@ public class NoiseUtils
 				j2 = 1;
 				k2 = 0;
 			}
-			else if(x >= z)//xzy
+			else if(fx0 >= fz0)//xzy
 			{
 				i1 = 1;
 				j1 = 0;
@@ -414,7 +405,7 @@ public class NoiseUtils
 		}
 		else
 		{
-			if(y < z)//zyx
+			if(fy0 < fz0)//zyx
 			{
 				i1 = 0;
 				j1 = 0;
@@ -423,7 +414,7 @@ public class NoiseUtils
 				j2 = 1;
 				k2 = 1;
 			}
-			else if(x < z)//yxz
+			else if(fx0 < fz0)//yxz
 			{
 				i1 = 0;
 				j1 = 1;
@@ -463,6 +454,214 @@ public class NoiseUtils
 		float n2 = SimplexGradient(SimplexHash(ixt+i2, iyt+j2, izt+k2), fx2, fy2, fz2);
 		float n3 = SimplexGradient(SimplexHash(ixt+1, iyt+1, izt+1), fx3, fy3, fz3);
 
-		return 32f * (n + n1 + n2 + n3);
+		float noise = 32f * (n + n1 + n2 + n3);//[-1, 1]
+		return (noise + 1) * 0.5f;
+	}
+
+	static private float SimplexNoise(float x, float y, float z, float w)
+	{
+		float f = (x+y+z+w)*F4;
+		int ix0 = fastfloor(x + f);
+		int iy0 = fastfloor(y + f);
+		int iz0 = fastfloor(z + f);
+		int iw0 = fastfloor(w + f);
+
+		float g = (ix0 + iy0 + iz0 + iw0) * G4;
+		float x0 = ix0 - g;
+		float y0 = iy0 - g;
+		float z0 = iz0 - g;
+		float w0 = iw0 - g;
+
+		float fx0 = x - x0;
+		float fy0 = y - y0;
+		float fz0 = z - z0;
+		float fw0 = w - w0;
+
+		int c1 = ( fx0 > fy0 ) ? 32 : 0;
+        int c2 = ( fx0 > fz0 ) ? 16 : 0;
+        int c3 = ( fy0 > fz0 ) ? 8 : 0;
+        int c4 = ( fx0 > fw0 ) ? 4 : 0;
+        int c5 = ( fy0 > fw0 ) ? 2 : 0;
+        int c6 = ( fz0 > fw0 ) ? 1 : 0;
+        int c = c1 + c2 + c3 + c4 + c5 + c6;
+        int i1, j1, k1, l1; // The integer offsets for the second simplex corner
+        int i2, j2, k2, l2; // The integer offsets for the third simplex corner
+        int i3, j3, k3, l3; // The integer offsets for the fourth simplex corner
+        // simplex[c] is a 4-vector with the numbers 0, 1, 2 and 3 in some order.
+        // Many values of c will never occur, since e.g. x>y>z>w makes x<z, y<w and x<w
+        // impossible. Only the 24 indices which have non-zero entries make any sense.
+        // We use a thresholding to set the coordinates in turn from the largest magnitude.
+        // The number 3 in the "simplex" array is at the position of the largest coordinate.
+        i1 = simplex[c][0] >= 3 ? 1 : 0;
+        j1 = simplex[c][1] >= 3 ? 1 : 0;
+        k1 = simplex[c][2] >= 3 ? 1 : 0;
+        l1 = simplex[c][3] >= 3 ? 1 : 0;
+        // The number 2 in the "simplex" array is at the second largest coordinate.
+        i2 = simplex[c][0] >= 2 ? 1 : 0;
+        j2 = simplex[c][1] >= 2 ? 1 : 0;
+        k2 = simplex[c][2] >= 2 ? 1 : 0;
+        l2 = simplex[c][3] >= 2 ? 1 : 0;
+        // The number 1 in the "simplex" array is at the second smallest coordinate.
+        i3 = simplex[c][0] >= 1 ? 1 : 0;
+        j3 = simplex[c][1] >= 1 ? 1 : 0;
+        k3 = simplex[c][2] >= 1 ? 1 : 0;
+        l3 = simplex[c][3] >= 1 ? 1 : 0;
+
+		float fx1 = fx0 - i1 + G4; // Offsets for second corner in (x,y,z,w) coords
+        float fy1 = fy0 - j1 + G4;
+        float fz1 = fz0 - k1 + G4;
+        float fw1 = fw0 - l1 + G4;
+
+        float fx2 = fx0 - i2 + 2.0f * G4; // Offsets for third corner in (x,y,z,w) coords
+        float fy2 = fy0 - j2 + 2.0f * G4;
+        float fz2 = fz0 - k2 + 2.0f * G4;
+        float fw2 = fw0 - l2 + 2.0f * G4;
+
+        float fx3 = fx0 - i3 + 3.0f * G4; // Offsets for fourth corner in (x,y,z,w) coords
+        float fy3 = fy0 - j3 + 3.0f * G4;
+        float fz3 = fz0 - k3 + 3.0f * G4;
+        float fw3 = fw0 - l3 + 3.0f * G4;
+
+        float fx4 = fx0 - 1.0f + 4.0f * G4; // Offsets for last corner in (x,y,z,w) coords
+        float fy4 = fy0 - 1.0f + 4.0f * G4;
+        float fz4 = fz0 - 1.0f + 4.0f * G4;
+        float fw4 = fw0 - 1.0f + 4.0f * G4;
+
+		ix0 &= 255;
+		iy0 &= 255;
+		iz0 &= 255;
+		iw0 &= 255;
+		float n = SimplexGradient(SimplexHash(ix0, iy0, iz0, iw0), fx0, fy0, fz0, fw0);
+		float n1 = SimplexGradient(SimplexHash(ix0+i1, iy0+j1, iz0+k1, iw0+l1), fx1, fy1, fz1, fw1);
+		float n2 = SimplexGradient(SimplexHash(ix0+i2, iy0+j2, iz0+k2, iw0+l2), fx2, fy2, fz2, fw2);
+		float n3 = SimplexGradient(SimplexHash(ix0+i3, iy0+j3, iz0+k3, iw0+l3), fx3, fy3, fz3, fw3);
+		float n4 = SimplexGradient(SimplexHash(ix0+1, iy0+1, iz0+1, iw0+1), fx4, fy4, fz4, fw4);
+
+		float noise = 27f * (n+n1+n2+n3+n4);//[-1, 1]
+		return (noise + 1) * 0.5f;
+	}
+
+    //二方连续
+	//X, Y is [0..1]
+	static public float SeamlessNoise( float x, float y, float dx, float dy, float xyOffset ) 
+	{
+	    float s = x;
+	    float t = y;
+ 
+	    float nx = xyOffset + Mathf.Cos(s * 2.0f * Mathf.PI) * dx / (2.0f * Mathf.PI);
+	    float ny = xyOffset + Mathf.Cos(t * 2.0f * Mathf.PI) * dy / (2.0f * Mathf.PI);
+	    float nz = xyOffset + Mathf.Sin(s * 2.0f * Mathf.PI) * dx / (2.0f * Mathf.PI);
+	    float nw = xyOffset + Mathf.Sin(t * 2.0f * Mathf.PI) * dy / (2.0f * Mathf.PI);
+ 
+	    return SimplexNoise(nx, ny, nz, nw);
+	}
+
+	static public float Noise(NoiseEnum type, float x, float y)
+	{
+		Noise2DFunction act = null;
+		if(type == NoiseEnum.Perlin)
+			act = PerlinNoise;
+		else if(type == NoiseEnum.Simplex)
+			act = SimplexNoise;
+
+		if(act != null)
+			return act.Invoke(x, y);
+		else
+			return 1f;
+	}
+
+	static public float Noise(NoiseEnum type, float x, float y, float z)
+	{
+		Noise3DFunction act = null;
+		if(type == NoiseEnum.Perlin)
+			act = PerlinNoise;
+		else if(type == NoiseEnum.Simplex)
+			act = SimplexNoise;
+
+		if(act != null)
+			return act.Invoke(x, y, z);
+		else
+			return 1f;
+	}
+
+	static public float Noise(NoiseEnum type, float x, float y, float z, float w)
+	{
+		Noise4DFunction act = null;
+		if(type == NoiseEnum.Simplex)
+			act = SimplexNoise;
+
+		if(act != null)
+			return act.Invoke(x, y, z, w);
+		else
+			return 1f;
+	}
+
+	//分形叠加
+	//octave 倍率
+	//frequency 频率
+	//amplitudy 振幅
+	static public float OcvateNoise(NoiseEnum type, float x, float y, int octave, float frequency, float amplitude)
+	{
+		float sum = 0;
+		float freq = 1f;
+		float amp = 1f;
+		float maxValue = 0;// Used for normalizing result to 0.0 - 1.0
+		for(int i = 0; i < octave; ++i)
+		{
+			sum += Noise(type, x * freq, y * freq) * amp;
+
+			maxValue += amp;
+
+			freq *= frequency;
+			amp *= amplitude;
+		}
+
+		return sum / maxValue;
+	}
+
+	//分形叠加
+	//octave 倍率
+	//frequency 频率
+	//amplitudy 振幅
+	static public float OcvateNoise(NoiseEnum type, float x, float y, float z, int octave, float frequency, float amplitude)
+	{
+		float sum = 0;
+		float freq = 1f;
+		float amp = 1f;
+		float maxValue = 0;// Used for normalizing result to 0.0 - 1.0
+		for(int i = 0; i < octave; ++i)
+		{
+			sum += Noise(type, x * freq, y * freq, z * freq) * amp;
+
+			maxValue += amp;
+
+			freq *= frequency;
+			amp *= amplitude;
+		}
+
+		return sum / maxValue;
+	}
+
+	//分形叠加
+	//octave 倍率
+	//frequency 频率
+	//amplitudy 振幅
+	static public float OcvateNoise(NoiseEnum type, float x, float y, float z, float w, int octave, float frequency, float amplitude)
+	{
+		float sum = 0;
+		float freq = 1f;
+		float amp = 1f;
+		float maxValue = 0;// Used for normalizing result to 0.0 - 1.0
+		for(int i = 0; i < octave; ++i)
+		{
+			sum += Noise(type, x * freq, y * freq, z * freq, w * freq) * amp;
+
+			maxValue += amp;
+
+			freq *= frequency;
+			amp *= amplitude;
+		}
+
+		return sum / maxValue;
 	}
 }
