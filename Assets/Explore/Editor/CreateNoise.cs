@@ -48,7 +48,6 @@ public class CreateNoise : ScriptableWizard
 					x *= Scale;
 					y *= Scale;
 					noise *= NoiseUtils.Noise(NoiseEnum.Perlin, x, y, 0);
-					//noise *= (float)perlin.perlin(x, y, 0);
 				}
 				else if(Type == NoiseType.SimplexNoise)
 				{
