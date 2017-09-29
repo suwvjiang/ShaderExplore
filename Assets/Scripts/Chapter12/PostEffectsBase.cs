@@ -3,20 +3,36 @@ using System.Collections;
 
 [ExecuteInEditMode]
 [RequireComponent (typeof(Camera))]
-public class PostEffectsBase : MonoBehaviour {
+public class PostEffectsBase : MonoBehaviour 
+{
+	public Shader ImageShader;
 
+	protected Material _mat;
+
+	public Material material
+	{
+		get
+		{
+			_mat = CheckShaderAndCreateMaterial(ImageShader, _mat);
+			return _mat;
+		}
+	}
 	// Called when start
-	protected void CheckResources() {
+	protected void CheckResources() 
+	{
 		bool isSupported = CheckSupport();
 		
-		if (isSupported == false) {
+		if (isSupported == false) 
+		{
 			NotSupported();
 		}
 	}
 
 	// Called in CheckResources to check support on this platform
-	protected bool CheckSupport() {
-		if (SystemInfo.supportsImageEffects == false || SystemInfo.supportsRenderTextures == false) {
+	protected bool CheckSupport() 
+	{
+		if (SystemInfo.supportsImageEffects == false ) 
+		{
 			Debug.LogWarning("This platform does not support image effects or render textures.");
 			return false;
 		}
@@ -25,27 +41,33 @@ public class PostEffectsBase : MonoBehaviour {
 	}
 
 	// Called when the platform doesn't support this effect
-	protected void NotSupported() {
+	protected void NotSupported() 
+	{
 		enabled = false;
 	}
 	
-	protected void Start() {
+	protected void Start() 
+	{
 		CheckResources();
 	}
 
 	// Called when need to create the material used by this effect
-	protected Material CheckShaderAndCreateMaterial(Shader shader, Material material) {
-		if (shader == null) {
+	protected Material CheckShaderAndCreateMaterial(Shader shader, Material material) 
+	{
+		if (shader == null) 
+		{
 			return null;
 		}
 		
 		if (shader.isSupported && material && material.shader == shader)
 			return material;
 		
-		if (!shader.isSupported) {
+		if (!shader.isSupported) 
+		{
 			return null;
 		}
-		else {
+		else 
+		{
 			material = new Material(shader);
 			material.hideFlags = HideFlags.DontSave;
 			if (material)

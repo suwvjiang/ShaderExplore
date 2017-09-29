@@ -10,7 +10,6 @@ using UnityEngine;
 
 public class EdgePostEffect : PostEffectsBase 
 {
-	public Shader EdgeDetectShader;
 	[Range(0.0f, 1.0f)]
 	public float EdgeOnly = 0f;
 	public Color EdgeColor = Color.white;
@@ -20,16 +19,6 @@ public class EdgePostEffect : PostEffectsBase
 	public float SensitivityDepth = 0.5f;
 	[Range(0, 0.5f)]
 	public float SensitivityNormal = 0.5f;
-
-	private Material _edgeMat = null;
-	public Material edgeMat
-	{
-		get
-		{
-			_edgeMat = CheckShaderAndCreateMaterial(EdgeDetectShader, _edgeMat);
-			return _edgeMat;
-		}
-	}
 
 	/// <summary>
 	/// This function is called when the object becomes enabled and active.
@@ -47,20 +36,20 @@ public class EdgePostEffect : PostEffectsBase
 	[ImageEffectOpaque]
 	void OnRenderImage(RenderTexture src, RenderTexture dest)
 	{
-		if(edgeMat == null)
+		if(material == null)
 		{
 			Graphics.Blit(src, dest);
 		}
 		else
 		{
-			edgeMat.SetTexture("_MainTex", src);
-			edgeMat.SetColor("_EdgeColor", EdgeColor);
-			edgeMat.SetColor("_BackgroundColor", BackgroundColor);
-			edgeMat.SetFloat("_EdgeOnly", EdgeOnly);
-			edgeMat.SetFloat("_SampleDistance", SampleDistance);
-			edgeMat.SetVector("_Sensitivity", new Vector2(SensitivityNormal, SensitivityDepth));
+			material.SetTexture("_MainTex", src);
+			material.SetColor("_EdgeColor", EdgeColor);
+			material.SetColor("_BackgroundColor", BackgroundColor);
+			material.SetFloat("_EdgeOnly", EdgeOnly);
+			material.SetFloat("_SampleDistance", SampleDistance);
+			material.SetVector("_Sensitivity", new Vector2(SensitivityNormal, SensitivityDepth));
 
-			Graphics.Blit(src, dest, edgeMat);
+			Graphics.Blit(src, dest, material);
 		}
 	}
 }

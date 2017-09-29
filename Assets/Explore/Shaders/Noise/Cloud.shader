@@ -93,7 +93,6 @@
 			{
 				float4 pos : SV_POSITION;
 				float2 uv : TEXCOORD0;
-				float4 srcPos:TEXCOORD1;
 			};
 
 			sampler2D _MainTex;
@@ -114,25 +113,27 @@
 				v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv;
-				o.srcPos = ComputeScreenPos(v.vertex);
 				return o;
 			}
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				float t = _Time.x * _Speed;
-				float q = 0;//fbm(i.uv * _CloudScale * 0.5, 7, 0, 0.1, 0.4);
+				i.uv *= float2(_ScreenParams.x/_ScreenParams.y, 1);
 
+				float t = _Time.x * _Speed;
+				float q = fbm(i.uv * _CloudScale * 0.5, 7, 0, 0.1, 0.4);
+
+				//shape
 				float2 uv1 = i.uv * _CloudScale;
 				uv1 += t - q;
-				float r = fbmabs(uv1, 8, t, 0.8, 0.7);
+				float r = fbmabs(uv1, 8, t, 0.7, 0.7);
 
 				float2 uv2 = i.uv * _CloudScale;
 				uv2 += t - q;
 				float f = fbm(uv2, 8, t, 0.7, 0.6);
-
 				f *= r + f;
 
+				//color
 				float t2 = _Time.x * _Speed * 2;
 				float2 uv3 = i.uv * _CloudScale * 2;
 				uv3 += t2 - q;
@@ -141,9 +142,9 @@
 				float t3 = _Time.x * _Speed * 3;
 				float2 uv4 = i.uv * _CloudScale * 3;
 				uv4 += t3 - q;
-				float c1 = fbmabs(uv3, 7, t3, 0.4, 0.6);
+				float cr = fbmabs(uv3, 7, t3, 0.4, 0.6);
 
-				float color = c + c1;
+				float color = c + cr;
 
 				fixed3 sky = lerp(_SkyColor2, _SkyColor1, i.uv.y);
 				fixed3 cloud = fixed3(1.1, 1.1, 0.9) * clamp((_CloudDark + _CloudLight * color), 0, 1);
