@@ -9,7 +9,7 @@ public class CommImageEffect : PostEffectsBase
 	/// </summary>
 	void OnEnable()
 	{
-		//GetComponent<Camera>().depthTextureMode |= DepthTextureMode.Depth;
+		GetComponent<Camera>().depthTextureMode |= DepthTextureMode.Depth;
 	}
 
 	void OnRenderImage(RenderTexture src, RenderTexture dest)

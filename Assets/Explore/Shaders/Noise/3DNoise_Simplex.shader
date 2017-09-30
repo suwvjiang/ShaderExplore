@@ -81,6 +81,22 @@
 			return dot(31.316, n);
 		}
 
+		float fbm(float3 p, int ocvate, float originFreq, float frequency, float originAmpl, float amplitude)
+		{
+			float total = 0;
+			float num = 0;
+			float freq = originFreq;
+			float ampl = originAmpl;
+			for(int i = 0; i < ocvate; ++i)
+			{
+				total += simplexNoise(p, freq) * ampl;
+				num += ampl;
+				freq *= frequency;
+				ampl *= amplitude;
+			}
+			return total / num;
+		}
+
 		ENDCG
 
 		Pass
@@ -131,21 +147,7 @@
 				float nl = dot(normalize(i.normal), light)*0.5 + 0.5;
 
 				i.worldPos = i.worldPos / _Scale;
-
-				fixed n;
-				fixed num;
-				fixed freq = 1;
-				fixed ampl = 0.5;
-				for(int j = 0; j < _Ocvate; ++j)
-				{
-					n += simplexNoise(i.worldPos, freq) * ampl;
-					num += ampl;
-
-					freq *= 2;
-					ampl *= 0.5;
-				}
-				
-				n /= num;
+				fixed n = fbm(i.worldPos, _Ocvate, 1, 2, 0.5, 0.5);
 				n = n * 0.5 + 0.5;
 
 				float last = n - _Amount;
