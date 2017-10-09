@@ -108,24 +108,24 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				float noise = fbm(i.worldPos, 1, 1, 2, 1, 0.5);
+				float noise = fbm(i.worldPos, 2, 1, 2, 1, 0.5);
 				noise = noise * 0.5 + 0.5;
 				// sample the texture
-				fixed mask = tex2Dproj(_MainTex, i.screen).r;
-				noise *= mask;
-
 				float2 uv = i.screen.xy/i.screen.w;
+				fixed mask = tex2D(_MainTex, uv).r;
+				//noise *= mask;
+
 				float2 roleUV = i.roleScreen.xy / i.roleScreen.w;
-				float dis = 1 - distance(uv, roleUV);
+				float dis = distance(uv, roleUV);
 
 				float depth = i.screen.z;
 				float roleDepth = i.roleScreen.z;
-				depth -= roleDepth;
-				depth /= roleDepth;
-				
-				clip(depth - noise);
+				depth = (roleDepth - depth)/roleDepth;
 
-				return fixed4(dis, dis,dis, 1);
+				dis = dis - noise * depth * mask;
+				clip(dis);
+
+				return fixed4(mask, mask, mask, 1);
 			}
 			ENDCG
 		}
