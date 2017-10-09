@@ -31,8 +31,6 @@ public class CreateNoise : ScriptableWizard
 	}
 	void OnWizardCreate()
 	{
-		Perlin perlin = new Perlin();
-
 		float cell = 1.0f / 512f;
 		Texture2D texture = new Texture2D(512, 512, TextureFormat.ARGB32, false);
 		Vector4 noise = Vector4.one;
