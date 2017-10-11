@@ -11,6 +11,8 @@ using UnityEngine;
 public class SceneGray : MonoBehaviour 
 {
 	public Transform Origin;
+	[Range(0, 1)]
+	public float Threshold;
 
 	private MeshFilter[] _subMesh;
 	private Renderer[] _subRender;
@@ -24,7 +26,18 @@ public class SceneGray : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		
+		for(int i = 0; i < _subRender.Length; ++i)
+		{
+			Renderer render = _subRender[i];
+			for(int j = 0; j < render.sharedMaterials.Length; ++j)
+			{
+				Material mat = render.sharedMaterials[j];
+				if(mat == null)
+					continue;
+
+				mat.SetFloat("_Threshold", Threshold);
+			}
+		}
 	}
 
 	private void InitSceneInfo()

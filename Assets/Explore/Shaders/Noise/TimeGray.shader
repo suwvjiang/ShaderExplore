@@ -3,10 +3,11 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
+		_RampTex("Ramp Texture", 2D) = ""{}
 		_AlphaTest("Alpha Test", Range(0, 1)) = 0.5
 		_DistanceEffect("Distance Effect", Range(0, 1)) = 0.5
-		_Threshold("Threshold", Range(0, 1)) = 0
 		_NoiseRange("Noise Range", Range(0, 0.1)) = 0.01
+		_Speed("Speed", Range(0, 20)) = 4
 	}
 	SubShader
 	{
@@ -32,10 +33,12 @@
 		};
 
 		sampler2D _MainTex;
+		sampler2D _RampTex;
 		float4 _MainTex_ST;
 		float _AlphaTest;
 		float _DistanceEffect;
 		float _NoiseRange;
+		float _Speed;
 
 		uniform float _MaxDistance;
 		uniform float3 _Origin;
@@ -57,12 +60,20 @@
 			fixed4 col = tex2D(_MainTex, i.uv);
 			clip(col.a - _AlphaTest);
 
-			float noise = simplexFBM(i.worldPos, 5, 1, 2, 1, 0.5) * 2 - 1;
+			float noise = valueFBM(i.worldPos, 4, 1, 2, 1, 0.5);
 			float dis = length(i.worldPos - _Origin)/_MaxDistance;
-			float temp = clamp(dis + noise * _NoiseRange - _Time.x, 0, 1);
+			dis = lerp(noise, dis, _DistanceEffect);
+			float temp = dis - _Threshold;
 
-			float gray = dot(float3(0.2125, 0.7154, 0.0721), col.rgb);
-			col.rgb = lerp(col.rgb, gray, sign(temp));
+			if(temp > _NoiseRange)
+			{
+				col.rgb = dot(float3(0.2125, 0.7154, 0.0721), col.rgb);;
+			}
+			else if(temp <= _NoiseRange && temp >= 0)
+			{
+				col.rgb = tex2D(_RampTex, float2(temp/_NoiseRange, 0)).rgb;
+			}
+
 			return col;
 		}
 		ENDCG

@@ -54,7 +54,7 @@
 			return 1.0 +(fd90 - 1.0) * pow5(1.0 - i);
 		}
 
-		//diffuse = albedo * (1+(fd90-1)*pow((1-nl), 5))*(1+(f-1)*pow((1-nv), 5))
+		//diffuse = albedo * (1+(fd90-1)*pow((1-nl), 5))*(1+(fd90-1)*pow((1-nv), 5))
 		//fd90 = 0.5 + 2 * perRoughness * pow(lh, 2)
 		float DisneyDiffuse(float nl, float nv, float lh,float perRoughness)
 		{
